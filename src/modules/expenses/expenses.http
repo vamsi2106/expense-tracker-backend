@@ -1,0 +1,13 @@
+GET http://localhost:3000/expenses
+###
+
+POST  http://localhost:3000/expenses
+Content-type:application/json
+
+{
+    "email" : "ererrrnagasritha@gmail.com",
+    "amount" : 2000,
+    "date" : "10-10-2024",
+    "name" : "pani poori",
+    "category" : "food"
+}
