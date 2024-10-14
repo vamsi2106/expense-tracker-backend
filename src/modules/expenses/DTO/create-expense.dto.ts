@@ -1,8 +1,46 @@
+import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn } from 'class-validator';
+import { Type } from 'class-transformer';
+
+let categoriesList =[
+  'Food',
+  'Entertainment',
+  'Taxes',
+  'Transport',
+  'Utilities',
+  'Equipment',
+  'Maintenance',
+  'Office Expenses',
+  'Events',
+]
 export class CreateExpenseDto {
-    readonly email: string;
-    readonly amount: number;
-    readonly date: Date;
-    readonly name: string;
-    readonly category: string;
-  }
-  
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+
+  @IsDate()
+  @Type(()=>Date)
+  @IsNotEmpty()
+  date: Date;
+
+  @IsString()
+  @IsIn([
+    'Food',
+    'Entertainment',
+    'Taxes',
+    'Transport',
+    'Utilities',
+    'Equipment',
+    'Maintenance',
+    'Office Expenses',
+    'Events',
+  ], { message: `Invalid category, only these values are allowed : ${categoriesList}` })
+  category: string;
+}

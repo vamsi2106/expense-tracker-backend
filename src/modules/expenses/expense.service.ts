@@ -15,15 +15,15 @@ export class ExpenseService {
     return this.expenseDao.findAllExpenses(startDate, endDate, filter);
   }
 
-  findOne(id: number) {
-    return this.expenseDao.findExpenseById(id);
-  }
+  // findOne(id: string) {
+  //   return this.expenseDao.findExpenseById(id);
+  // }
 
-  update(id: number, updateExpenseDto: UpdateExpenseDto) {
+  update(id: string, updateExpenseDto: UpdateExpenseDto) {
     return this.expenseDao.updateExpense(id, updateExpenseDto);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.expenseDao.deleteExpense(id);
   }
 }

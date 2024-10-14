@@ -1,13 +1,39 @@
-GET http://localhost:3000/expenses
+@url = http://localhost:5000/expenses
+
+//to fetch all details
+GET {{url}}/
+Accept: application/json
 ###
 
-POST  http://localhost:3000/expenses
+//to fetch expenses from start-date to end date
+GET {{url}}?startDate=2024-10-01&endDate=2024-10-14
+###
+
+//to fetch the data related to the category
+GET {{url}}?filter=Transport
+Accept: application/json
+###
+
+POST  http://localhost:5000/expenses
 Content-type:application/json
 
 {
-    "email" : "ererrrnagasritha@gmail.com",
+    "email" : "ernagasritha@gmail.com",
     "amount" : 2000,
-    "date" : "10-10-2024",
-    "name" : "pani poori",
-    "category" : "food"
+    "date" : "2024-10-12",
+    "name" : "Isha foundation trip",
+    "category" : "Transport"
 }
+###
+
+//to update the db
+PUT {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
+Content-Type: application/json
+
+{
+    "date" : "2024-10-12"
+}
+###
+
+//to delete the column
+DELETE {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
