@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -21,18 +21,43 @@ export class ExpenseController {
     return this.expenseService.findAll(startDate, endDate, filter);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return this.expenseService.findOne(id);
-  }
+  // @Get(':id')
+  // async findOne(@Param('id') id: number) {
+  //   return this.expenseService.findOne(id);
+  // }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expenseService.update(id, updateExpenseDto);
+  async update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
+    const updatedExpense = await this.expenseService.update(id, updateExpenseDto);
+    
+    if (!updatedExpense) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Expense not found or update failed' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    
+    return {
+      status: 'success',
+      message: 'Expense updated successfully',
+      data: updatedExpense, // You can include the updated data if needed
+    };
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return this.expenseService.remove(id);
+  async remove(@Param('id') id: string) {
+    const result = await this.expenseService.remove(id);
+    
+    if (!result) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Expense not found or deletion failed' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return {
+      status: 'success',
+      message: 'Expense deleted successfully',
+    };
   }
 }
