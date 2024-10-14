@@ -7,8 +7,8 @@ import { ExpenseDao } from 'src/database/mssql/dao/expense.mgmt';
 import { DbModule } from 'src/database/database.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Expense]),DbModule],
+  imports: [SequelizeModule.forFeature([Expense]), DbModule],
   controllers: [ExpenseController],
-  providers: [ExpenseService,ExpenseDao],
+  providers: [ExpenseService, ExpenseDao],
 })
 export class ExpenseModule {}
