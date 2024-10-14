@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
-  await app.listen(configService.getServerPort(), () => {
+  await app.listen(5000, () => {
     console.log('post:5000');
   });
 }
