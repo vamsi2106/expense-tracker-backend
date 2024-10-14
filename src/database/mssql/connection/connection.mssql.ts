@@ -1,42 +1,30 @@
-import { SequelizeModuleOptions, SequelizeOptionsFactory } from '@nestjs/sequelize';
-import { ConfigServices } from 'src/config/appconfig.service';
-import { SchemasList } from './schemas.mssql';
+import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
-export class DatabaseConfigService implements SequelizeOptionsFactory {
-  
-  private configService: ConfigServices;
-
-  constructor() {
-    // Manually create an instance of ConfigServices
-    this.configService = new ConfigServices();
-  }
-
-  createSequelizeOptions(): SequelizeModuleOptions {
-    return {
-      dialect: 'mssql',
-      host: this.configService.getHost(),
-      port: this.configService.getPort(),
-      username: this.configService.getUsername(),
-      password: this.configService.getPassword(),
-      database: this.configService.getDatabase(),
-      models : SchemasList,
-      dialectOptions: {
-        authentication: {
-          type: 'ntlm',
-          options: {
-            domain: this.configService.getDomain(),
-            userName: this.configService.getUsername(),
-            password: this.configService.getPassword(),
-          },
-        },
+export const DatabaseConfigService = SequelizeModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService): SequelizeModuleOptions => ({
+    dialect: 'mssql',
+    host: configService.get<string>('DB_HOST'),
+    port: configService.get<number>('DB_PORT'),
+    database: configService.get<string>('DB_NAME'),
+    dialectOptions: {
+      authentication: {
+        type: 'ntlm',
         options: {
-          trustedConnection: true,
-          encrypt: false,
-          enableArithAbort: true,
+          domain: configService.get<string>('DB_DOMAIN'),
+          userName: configService.get<string>('DB_USERNAME'),
+          password: configService.get<string>('DB_PASSWORD'),
         },
       },
-      autoLoadModels: true,
-      synchronize: true,
-    };
-  }
-}
+      options: {
+        encrypt: true, // Set to true if your SQL Server requires encryption
+        trustServerCertificate: true, // Set to true for development only
+        enableArithAbort: true, // Required for certain configurations
+      },
+    },
+    autoLoadModels: true,
+    synchronize: true, // Use with caution in production; consider migrations instead
+  }),
+});
