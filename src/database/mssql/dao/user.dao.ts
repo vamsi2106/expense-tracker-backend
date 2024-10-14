@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../models/user.model';
+import { Role } from 'src/core/enums/roles.enum';
 
 @Injectable()
 export class UserDao {
@@ -9,7 +10,7 @@ export class UserDao {
   async createUser(
     username: string,
     email: string,
-    role?: 'admin' | 'user',
+    role?: Role,
   ): Promise<User> {
     return await this.userModel.create({ username, email, role });
   }

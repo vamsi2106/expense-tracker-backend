@@ -1,18 +1,13 @@
 import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { DatabaseConfigService } from '../../database/mssql/connection/connection.mssql';
+import {  DbModule } from 'src/database/database.module';
 import { UserDao } from 'src/database/mssql/dao/user.dao';
-import { DbModule } from 'src/database/database.module';
-import { User } from 'src/database/mssql/models/user.model';
 
 @Module({
-  imports: [
-    DbModule,
-    SequelizeModule.forFeature([User]),
-    ],
-  providers: [UserDao, UsersService],
+  imports: [DbModule],
+  providers: [UsersService],
   controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}

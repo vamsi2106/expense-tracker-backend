@@ -1,0 +1,17 @@
+GET http://localhost:5000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjZjODNlOC0wZDdlLTQ4NWMtOTQ3ZC1lMTNjMTQwYmQ4NDAiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6Im5hZ2FzYWkudmFtc2lAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJpYXQiOjE3Mjg5MjU1OTIsImV4cCI6MTcyODkyOTE5Mn0.U15zTD_Jy2hOxVlrNuTZSS3Nam_EIc4GNeJ0cTY3REs
+
+
+
+###
+
+POST http://localhost:5000/users
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjNDg0YTJhYi1lOTIzLTQyM2MtOGM3YS01ZGU4NWRjODUxOTMiLCJ1c2VybmFtZSI6IkJlbm55IiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6ImpvaG4uYmVubnlAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDEyOjUxOjE0LjcwOFoiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDEyOjU4OjU3LjQwOFoiLCJpYXQiOjE3Mjg5MTEzOTcsImV4cCI6MTcyODkxNDk5N30.YSnvOoD-Tyhmx6VRMEJt1oMaUd1wSJCUr_onyMGkcYk
+Content-Type: application/json
+
+{
+    "username":"Vamsi",
+    "email":"nagasai.vamsi@g7cr.com",
+    "role":"admin"
+
+}

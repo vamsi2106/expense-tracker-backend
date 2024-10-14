@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserDao } from '../../database/mssql/dao/user.dao';
 import { User } from '../../database/mssql/models/user.model';
+import { Role } from 'src/core/enums/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -9,7 +10,7 @@ export class UsersService {
   async createUser(
     username: string,
     email: string,
-    role?: 'admin' | 'user',
+    role?: Role,
   ): Promise<User> {
     return await this.userDao.createUser(username, email, role);
   }
