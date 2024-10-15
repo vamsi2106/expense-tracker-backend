@@ -7,9 +7,14 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 export class ExpenseService {
   constructor(private readonly expenseDao: ExpenseDao) {}
 
-  create(createExpenseDto: CreateExpenseDto) {
-    return this.expenseDao.createExpense(createExpenseDto);
+  // create(createExpenseDto: CreateExpenseDto) {
+  //   return this.expenseDao.createExpense(createExpenseDto);
+  // }
+
+  async create(expenseData: CreateExpenseDto, options?: any) {
+    return this.expenseDao.createExpense(expenseData, options);
   }
+  
 
   findAll(startDate?: string, endDate?: string, filter?: string) {
     return this.expenseDao.findAllExpenses(startDate, endDate, filter);

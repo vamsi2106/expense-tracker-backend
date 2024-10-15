@@ -12,9 +12,9 @@ export class ExpenseDao {
         private readonly expenseModel: typeof Expense,  // Ensure this matches
       ) {}
 
-  async createExpense(createExpenseDto: CreateExpenseDto): Promise<Expense> {
+  async createExpense(createExpenseDto: CreateExpenseDto,options?:null) {
     //let expenseId = uuid();
-    return this.expenseModel.create({...createExpenseDto});
+    return this.expenseModel.create({...createExpenseDto},options);
   }
 
   async findAllExpenses(startDate?: string, endDate?: string, filter?: string): Promise<Expense[]> {

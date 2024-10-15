@@ -9,6 +9,7 @@ export class AzureBlobStorageService {
   private configServices = new ConfigServices();
   private appContainerName = this.configServices.getappContainerName();
   private logContainerName = this.configServices.getLogContainerName();
+  private connectionString = this.configServices.getConnectionString();
 
   constructor() {
     this.blobServiceClient = BlobServiceClient.fromConnectionString(
@@ -20,17 +21,20 @@ export class AzureBlobStorageService {
   
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
+    console.log(this.appContainerName);
+    console.log(this.connectionString);
     const containerClient = this.blobServiceClient.getContainerClient(this.appContainerName);
     const blockBlobClient = containerClient.getBlockBlobClient(file.originalname);
 
     const uploadBlobResponse = await blockBlobClient.uploadData(file.buffer);
+    console.log(uploadBlobResponse,'uploadBlockResponse');
     if (!uploadBlobResponse) {
       throw new Error('File upload to Azure failed');
     }
 
     // Log the upload event
-    await this.logEvent(`Uploaded file: ${file.originalname}`);
-
+    //await this.logEvent(`Uploaded file: ${file.originalname}`);
+    console.log(blockBlobClient,blockBlobClient);
     return blockBlobClient.url; // Return the URL of the uploaded file
   }
 
