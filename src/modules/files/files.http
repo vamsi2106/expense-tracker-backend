@@ -4,4 +4,4 @@ GET {{url}}
 Accept: application/json
 ###
 
-DELETE {{url}}/delete/0a03c772-ca68-4137-b6c8-bb9ff71a41e1
+DELETE {{url}}/delete/acb54a54-e334-4b54-aa4f-d36e0d21200d

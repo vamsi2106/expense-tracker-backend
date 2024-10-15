@@ -31,4 +31,10 @@ export class ExpenseService {
   remove(id: string) {
     return this.expenseDao.deleteExpense(id);
   }
+
+  async deleteExpensesByFileId(fileId: string, options?: any): Promise<boolean> {
+    return this.expenseDao.deleteExpensesByFileId(fileId, options);
+  }
+
+  
 }

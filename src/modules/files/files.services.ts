@@ -45,7 +45,6 @@ export class FileService {
       );
     }
   }
-  
 
   private async processCsvBuffer(buffer: Buffer, transaction: any, fileId: string): Promise<void> {
     const expenses: CreateExpenseDto[] = [];
@@ -97,7 +96,6 @@ export class FileService {
     });
   }
   
-
   async getFileById(id: string): Promise<File> {
     const file = await this.fileDao.findById(id);
     if (!file) {
@@ -110,7 +108,31 @@ export class FileService {
     return this.fileDao.findAll();
   }
 
-  async remove(id:string) : Promise<boolean>{
-    return this.fileDao.deleteFile(id);
+  async remove(id: string): Promise<boolean> {
+    const transaction = await this.sequelize.transaction();
+    try {
+      // First, find the file by ID
+      const file = await this.fileDao.findById(id);
+      if (!file) {
+        throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+      }
+
+      // Delete expenses associated with the file ID
+      await this.expenseService.deleteExpensesByFileId(file.id, { transaction });
+
+      // Delete the file
+      const result = await this.fileDao.deleteFile(id, { transaction });
+      
+      await transaction.commit();
+
+      return result;
+    } catch (error) {
+      await transaction.rollback();
+      console.error("Transaction rolled back due to error: ", error.message);
+      throw new HttpException(
+        `Error deleting file and related expenses: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -25,12 +25,16 @@ export class FileDao {
     return this.fileModel.findAll();
   }
 
-  async deleteFile(id:string):Promise<boolean>{
+  async deleteFile(id: string, options?: any): Promise<boolean> {
     const file = await this.fileModel.findByPk(id);
-    if(!file){
-      return false;
+    
+    if (!file) {
+      return false; // File not found
     }
-    await file.destroy();
-    return true;
+  
+    // Use the provided options for transaction support
+    await file.destroy(options); // Ensure this deletes the file within the transaction
+    return true; // Deletion was successful
   }
+  
 }
