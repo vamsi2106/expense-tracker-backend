@@ -1,5 +1,14 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  PrimaryKey,
+  Default,
+  ForeignKey,
+} from 'sequelize-typescript';
 import { File } from './file.model';
+import { User } from './user.model';
 
 @Table({ tableName: 'expenses' })
 export class Expense extends Model {
@@ -8,6 +17,7 @@ export class Expense extends Model {
   @Column({ type: DataType.UUID })
   id: string;
 
+  @ForeignKey(() => User)
   @Column({ type: DataType.STRING, allowNull: false })
   email: string;
 
