@@ -12,9 +12,9 @@ export class ExpenseDao {
         private readonly expenseModel: typeof Expense,  // Ensure this matches
       ) {}
 
-  async createExpense(createExpenseDto: CreateExpenseDto): Promise<Expense> {
+  async createExpense(createExpenseDto: CreateExpenseDto,options?:null) {
     //let expenseId = uuid();
-    return this.expenseModel.create({...createExpenseDto});
+    return this.expenseModel.create({...createExpenseDto},options);
   }
 
   async findAllExpenses(startDate?: string, endDate?: string, filter?: string): Promise<Expense[]> {
@@ -48,5 +48,14 @@ export class ExpenseDao {
     await expense.destroy(); // Delete the expense
     return true; // Deletion was successful
   }
+
   
+  async deleteExpensesByFileId(fileId: string, options?: any): Promise<boolean> {
+    const deletedCount = await this.expenseModel.destroy({
+      where: { file_id: fileId },
+      ...options, // Pass options to support transactions
+    });
+    
+    return deletedCount > 0; // Return true if any expenses were deleted
+  }
 }

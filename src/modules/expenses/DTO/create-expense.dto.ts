@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 let categoriesList =[
@@ -43,4 +43,8 @@ export class CreateExpenseDto {
     'Events',
   ], { message: `Invalid category, only these values are allowed : ${categoriesList}` })
   category: string;
+
+  @IsString()
+  @IsOptional()
+  file_id ?: string;
 }
