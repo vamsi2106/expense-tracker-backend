@@ -1,3 +1,4 @@
+// src/modules/auth/jwtAuth.service.ts
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 

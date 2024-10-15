@@ -1,3 +1,4 @@
+// src/modules/users/users.controller.ts
 import {
   Controller,
   Post,
@@ -26,27 +27,25 @@ export class UsersController {
     return this.userService.createUser(body.username, body.email, body.role);
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.admin)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     return this.userService.findAllUsers();
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.admin)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findUserById(@Param('id') id: string) {
     return await this.userService.findUserById(id);
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.admin)
+  @UseGuards(JwtAuthGuard)
   @Get('username/:username')
   async findUserByName(@Param('username') username: string) {
     return await this.userService.findUserByName(username);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('email/:email')
   async findUserByEmail(@Param('email') email: string) {
     return await this.userService.findUserByEmail(email);
@@ -59,8 +58,8 @@ export class UsersController {
     return await this.userService.updateUserById(id, body);
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.admin)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Roles(Role.admin)
   @Delete('remove/:id')
   async deleteUserById(@Param('id') id: string) {
     return await this.userService.deleteUserById(id);

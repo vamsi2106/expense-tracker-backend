@@ -1,8 +1,5 @@
 GET http://localhost:5000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjZjODNlOC0wZDdlLTQ4NWMtOTQ3ZC1lMTNjMTQwYmQ4NDAiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6Im5hZ2FzYWkudmFtc2lAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJpYXQiOjE3Mjg5MjU1OTIsImV4cCI6MTcyODkyOTE5Mn0.U15zTD_Jy2hOxVlrNuTZSS3Nam_EIc4GNeJ0cTY3REs
-
-
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwZTg4Y2VkYi1iYzMzLTRiMWUtOGI2Ni0zYWM4OTY5YWIzMjAiLCJ1c2VybmFtZSI6IkUgTmFnYXNyaXRoYSIsInVzZXJJbWFnZVVybCI6bnVsbCwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNVQwNzoyOToyNS41ODRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNVQwNzoyOToyNS41ODRaIiwiaWF0IjoxNzI4OTc3NDIzLCJleHAiOjE3Mjg5ODEwMjN9.2UDf4oJo38k1Tz-UZFjpqav4UT3fj0hTMXpD93Ml7ec
 ###
 
 POST http://localhost:5000/users
@@ -10,8 +7,10 @@ POST http://localhost:5000/users
 Content-Type: application/json
 
 {
-    "username":"Vamsi",
-    "email":"nagasai.vamsi@g7cr.com",
-    "role":"admin"
-
+    "username":"E R Nagasritha",
+    "email":"nagasritha.er@g7cr.com",
+    "role":"user"
 }
+
+###
+DELETE http://localhost:5000/users/remove/0e88cedb-bc33-4b1e-8b66-3ac8969ab320

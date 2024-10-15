@@ -9,7 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   await app.listen(5000, () => {
-    console.log('post:5000');
+    console.log('server running at http://localhost:5001');
   });
 }
 bootstrap();
