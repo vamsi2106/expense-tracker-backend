@@ -12,6 +12,7 @@ export class ExpenseController {
     return this.expenseService.create(createExpenseDto);
   }
 
+
   @Get()
   async findAll(
     @Query('startDate') startDate?: string,
@@ -21,10 +22,18 @@ export class ExpenseController {
     return this.expenseService.findAll(startDate, endDate, filter);
   }
 
-  // @Get(':id')
-  // async findOne(@Param('id') id: number) {
-  //   return this.expenseService.findOne(id);
-  // }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    let data = this.expenseService.findOne(id);
+
+    if(!data){
+      throw new HttpException(
+        {status : HttpStatus.NOT_FOUND, error: "Expense with the given Id does not exist"},HttpStatus.NOT_FOUND
+      )
+    }else{
+      return data;
+    }
+  }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
