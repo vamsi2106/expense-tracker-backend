@@ -55,9 +55,9 @@ export class ExpenseDao {
     return this.expenseModel.findAll({ where: whereClause });
   }
 
-  // async findExpenseById(id: number): Promise<Expense> {
-  //   return this.expenseModel.findByPk(id);
-  // }
+  async findExpenseById(id: string): Promise<Expense> {
+    return this.expenseModel.findByPk(id);
+  }
 
   async updateExpense(id: string, updateExpenseDto: UpdateExpenseDto): Promise<Expense | null> {
     const expense = await this.expenseModel.findByPk(id);
