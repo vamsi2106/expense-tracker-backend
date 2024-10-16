@@ -11,7 +11,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   
   await app.listen(5000, () => {
-    console.log('post:5000');
+    console.log('server running at http://localhost:5000');
   });
 }
 bootstrap();

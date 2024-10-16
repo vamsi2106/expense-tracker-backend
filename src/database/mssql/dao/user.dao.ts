@@ -1,3 +1,4 @@
+// src/user/doa/user.dao.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../models/user.model';
@@ -12,6 +13,7 @@ export class UserDao {
     email: string,
     role?: Role,
   ): Promise<User> {
+    console.log('Creating user:', username, email, role);
     return await this.userModel.create({ username, email, role });
   }
 
