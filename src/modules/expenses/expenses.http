@@ -24,7 +24,7 @@ Content-type:application/json
 {
     "email" : "ernagasritha@gmail.com",
     "amount" : 2000,
-    "date" : "2024-10-12",
+    "date" : "2024-10-13",
     "name" : "Isha foundation trip",
     "category" : "Transport"
 }
@@ -41,3 +41,21 @@ Content-Type: application/json
 
 //to delete the column
 DELETE {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
+###
+
+GET {{url}}/filter/group-by-date?offset=0
+###
+
+GET {{url}}/filter/group-by-category?startDate=2024-10-01&endDate=2024-10-07
+###
+
+GET {{url}}/filter/group-by-category
+###
+
+GET {{url}}/filter/group-by-week
+###
+
+GET {{url}}/filter/group-by-month
+###
+
+GET {{url}}/filter/group-by-year

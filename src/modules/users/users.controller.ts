@@ -26,6 +26,11 @@ export class UsersController {
     private readonly emailService: EmailService,
   ) {}
 
+  @Post()
+  async create(@Body() body: {username: string, email: string, role: Role} ){
+    return this.userService.createUser(body.username, body.email, body.role)
+  }
+
   @Post('check-email')
   async checkEmail(@Body('email') email: string) {
     const user = await this.userService.findUserByEmail(email);

@@ -36,5 +36,26 @@ export class ExpenseService {
     return this.expenseDao.deleteExpensesByFileId(fileId, options);
   }
 
-  
+  //querry code
+  // Service method to call DAO for expenses grouped by date with offset
+  async getExpensesGroupedByDateWithOffset(offset: number = 0) {
+    return this.expenseDao.getExpensesGroupedByDateWithOffset(offset);
+  }
+
+  // Service method to call DAO for expenses grouped by category
+  async getExpensesGroupedByCategory(startDate?: string, endDate?: string) {
+    return this.expenseDao.getExpensesGroupedByCategory(startDate, endDate);
+  }
+
+  async getExpensesGroupedByWeek(month:number,year:number){
+    return this.expenseDao.getExpensesGroupedByWeek(month,year);
+  }
+  async getExpensesGroupedByMonth(year?: number) {
+    return this.expenseDao.getExpensesGroupedByMonth(year);
+  }
+
+  async getExpensesGroupedByYear(): Promise<any[]> {
+    return this.expenseDao.getExpensesGroupedByYear();
+}
+
 }

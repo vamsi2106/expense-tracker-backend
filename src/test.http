@@ -9,9 +9,9 @@ Content-Type: application/json
 {
     "username":"E R Nagasritha",
     "email":"nagasritha.er@g7cr.com",
-    "role":"user"
+    "role":"admin"
 }
-ef64c046-7427-4ea4-b241-20c496132f5c
+
 ###
-DELETE http://localhost:5000/users/remove/0b7f12cb-5199-4411-9fc2-70fac77c9775	
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjZjODNlOC0wZDdlLTQ4NWMtOTQ3ZC1lMTNjMTQwYmQ4NDAiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6Im5hZ2FzYWkudmFtc2lAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJpYXQiOjE3MjkwMjMxODEsImV4cCI6MTcyOTAyNjc4MX0.86WO88d3BO4rLXpJm9IZtUjcfs5r41DOYie6VFVFrlU
+DELETE http://localhost:5000/users/remove/5a0bcabf-afa1-459c-9db8-df3f58574df3	
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjZjODNlOC0wZDdlLTQ4NWMtOTQ3ZC1lMTNjMTQwYmQ4NDAiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6Im5hZ2FzYWkudmFtc2lAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJpYXQiOjE3MjkwMjMxODEsImV4cCI6MTcyOTAyNjc4MX0.86WO88d3BO4rLXpJm9IZtUjcfs5r41DOYie6VFVFrlU
