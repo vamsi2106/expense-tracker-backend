@@ -1,5 +1,5 @@
 // src/modules/users/users.service.ts
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { UserDao } from '../../database/mssql/dao/user.dao';
 import { User } from '../../database/mssql/models/user.model';
 import { Role } from 'src/core/enums/roles.enum';
@@ -13,7 +13,13 @@ export class UsersService {
     email: string,
     role?: Role,
   ): Promise<User> {
-    return await this.userDao.createUser(username, email, role);
+    try {
+      const user = await this.userDao.createUser(username, email, role);
+      return user; // Return the created user
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw new BadRequestException('Failed to create user'); // Throwing a user-friendly error
+    }
   }
 
   async findAllUsers(): Promise<User[]> {
