@@ -26,6 +26,12 @@ export class UsersController {
     private readonly emailService: EmailService,
   ) {}
 
+  @Post('check-email')
+  async checkEmail(@Body('email') email: string) {
+    const user = await this.userService.findUserByEmail(email);
+    return { userFound: !!user }; // Return true if user exists, false otherwise
+  }
+
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.admin)
   @Get()
