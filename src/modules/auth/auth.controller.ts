@@ -22,6 +22,7 @@ export class AuthController {
 
   @Post('callback')
   async handleCallback(@Body('code') code: string) {
+    console.log('code after login', code);
     return await this.authService.exchangeCodeForTokens(code);
   }
 }

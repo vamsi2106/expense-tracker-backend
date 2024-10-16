@@ -36,12 +36,14 @@ export class AuthService {
     }
   }
 
+  // src/modules/auth/auth.service.ts
   async exchangeCodeForTokens(code: string) {
     try {
-      let tentantId = this.appService.getTenantId();
-      let client_id = this.appService.getClientId();
-      let redirect_uri = this.appService.getRedirectUri();
-      let client_secret = this.appService.getClientSecret();
+      const tentantId = this.appService.getTenantId();
+      const client_id = this.appService.getClientId();
+      const redirect_uri = this.appService.getRedirectUri();
+      const client_secret = this.appService.getClientSecret();
+
       const tokenResponse = await axios.post(
         `https://login.microsoftonline.com/${tentantId}/oauth2/v2.0/token`,
         new URLSearchParams({
@@ -52,29 +54,21 @@ export class AuthService {
           grant_type: 'authorization_code',
         }).toString(),
         {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         },
       );
 
-      let userDetails = await this.getUserDetails(
+      const userDetails = await this.getUserDetails(
         tokenResponse.data.access_token,
       );
-      let tokenAndData = {
-        token: tokenResponse.data,
-        userDetails: userDetails,
-      };
+      const user = await this.userService.findUserByEmail(userDetails.mail);
 
-      let user = await this.userService.findUserByEmail(userDetails.mail);
-      console.log('User', user.dataValues);
-      let customToken = await this.jwtService.generateJwt(user.dataValues);
+      if (!user) {
+        // User not found, return an error message to the frontend
+        return { error: 'User not found', redirect: true };
+      }
 
-      console.log('Custom token', customToken);
-
-      // let customPayload = await this.jwtService.verifyToken(customToken);
-
-      // console.log("Custom Payload", customPayload)
+      const customToken = await this.jwtService.generateJwt(user.dataValues);
 
       return {
         token: customToken,
