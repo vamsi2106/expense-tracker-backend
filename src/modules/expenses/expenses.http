@@ -1,11 +1,11 @@
-@url = http://localhost:5000/expenses
+@url = http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/expenses
 
 //to fetch all details
 GET {{url}}/
 Accept: application/json
 ###
 
-GET {{url}}/6df572fd-916d-461b-8cee-2c77fd994eea
+GET {{url}}/0a421d2c-1a2c-4f9b-8315-62c850c4a2a7
 Accept: application/json
 ###
 
@@ -18,11 +18,11 @@ GET {{url}}?filter=Transport
 Accept: application/json
 ###
 
-POST  http://localhost:5000/expenses
+POST  http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/expenses
 Content-type:application/json
 
 {
-    "email" : "ernagasritha@gmail.com",
+    "user_id" : "0b21908b-b55f-47b5-b33f-c7f4ebe61b53",
     "amount" : 2000,
     "date" : "2024-9-13",
     "name" : "Hospetal charges",
@@ -46,7 +46,7 @@ DELETE {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
 GET {{url}}/filter/group-by-date?offset=0
 ###
 
-GET {{url}}/filter/group-by-category?startDate=2024-10-01&endDate=2024-10-07
+GET {{url}}/filter/group-by-category?startDate=2024-9-11&endDate=2024-10-07
 ###
 
 GET {{url}}/filter/group-by-category?file_id=9344874e-5f5b-4083-a919-cdf3d298f117

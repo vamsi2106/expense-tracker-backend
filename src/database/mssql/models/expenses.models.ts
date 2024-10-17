@@ -19,7 +19,7 @@ export class Expense extends Model {
 
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, allowNull: false })
-  email: string;
+  user_id: string;
 
   @Column({ type: DataType.FLOAT, allowNull: false })
   amount: number;

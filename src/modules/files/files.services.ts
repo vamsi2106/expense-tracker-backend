@@ -15,7 +15,7 @@ export class FileService {
     private readonly sequelize: Sequelize,
   ) {}
 
-  async uploadFile(file: Express.Multer.File, fileUrl: string): Promise<File> {
+  async uploadFile(userId:string, file: Express.Multer.File, fileUrl: string): Promise<File> {
     const { originalname, mimetype, size } = file;
   
     const fileData: Partial<File> = {
@@ -23,6 +23,7 @@ export class FileService {
       mimeType: mimetype,
       fileUrl,
       size,
+      user_id : userId
     };
   
     const transaction = await this.sequelize.transaction();
@@ -32,7 +33,7 @@ export class FileService {
       console.log(newFile, 'File added to the DB');
   
       // Pass the file ID to the CSV processing method
-      await this.processCsvBuffer(file.buffer, transaction, newFile.id);
+      await this.processCsvBuffer(userId,file.buffer, transaction, newFile.id);
   
       await transaction.commit();
       return newFile;
@@ -46,7 +47,7 @@ export class FileService {
     }
   }
 
-  private async processCsvBuffer(buffer: Buffer, transaction: any, fileId: string): Promise<void> {
+  private async processCsvBuffer(userId:string,buffer: Buffer, transaction: any, fileId: string): Promise<void> {
     const expenses: CreateExpenseDto[] = [];
     const readableStream = new stream.Readable();
     readableStream.push(buffer);
@@ -60,7 +61,7 @@ export class FileService {
         .on('data', (row) => {
           const expenseData: CreateExpenseDto = {
             name: row.name,
-            email: row.email,
+            user_id: userId,
             amount: parseFloat(row.amount),
             date: new Date(row.date),
             category: row.category,
@@ -96,32 +97,33 @@ export class FileService {
     });
   }
   
-  async getFileById(id: string): Promise<File> {
-    const file = await this.fileDao.findById(id);
+  async getFileById(userId:string, id: string): Promise<File> {
+    const file = await this.fileDao.findById(userId,id);
     if (!file) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
     return file;
   }
 
-  async getAllFiles(): Promise<File[]> {
-    return this.fileDao.findAll();
+  async getAllFiles(userId:string): Promise<File[]> {
+    return this.fileDao.findAll(userId);
   }
 
-  async remove(id: string): Promise<boolean> {
+  async remove(userId:string, id: string): Promise<boolean> {
+    console.log(userId);
     const transaction = await this.sequelize.transaction();
     try {
       // First, find the file by ID
-      const file = await this.fileDao.findById(id);
+      const file = await this.fileDao.findById(userId,id);
       if (!file) {
         throw new HttpException('File not found', HttpStatus.NOT_FOUND);
       }
 
       // Delete expenses associated with the file ID
-      await this.expenseService.deleteExpensesByFileId(file.id, { transaction });
+      await this.expenseService.deleteExpensesByFileId(userId,file.id, { transaction });
 
       // Delete the file
-      const result = await this.fileDao.deleteFile(id, { transaction });
+      const result = await this.fileDao.deleteFile(userId, id, { transaction });
       
       await transaction.commit();
 

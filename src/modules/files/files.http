@@ -1,7 +1,7 @@
-@url = http://localhost:5000/files
+@url = http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/files
 
 GET {{url}}
 Accept: application/json
 ###
 
-DELETE {{url}}/delete/acb54a54-e334-4b54-aa4f-d36e0d21200d
+DELETE {{url}}/delete/e1952990-fdd1-44df-807d-75f431e25cf3

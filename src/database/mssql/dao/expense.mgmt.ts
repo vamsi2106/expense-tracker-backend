@@ -19,7 +19,7 @@ export class ExpenseDao {
 
 
   async createExpense(createExpenseDto: CreateExpenseDto, options?: any): Promise<Expense | void | null> {
-    const { name, amount, date, category } = createExpenseDto;
+    const { user_id, name, amount, date, category } = createExpenseDto;
     let updatedFullDate = new Date(date);
     console.log(updatedFullDate);
     // Check for existing expense with the same name, amount, date, and category
@@ -28,7 +28,8 @@ export class ExpenseDao {
         date: updatedFullDate,
         name,
         amount,
-        category
+        category,
+        user_id
       },
     });
     console.log(existingExpense);
@@ -47,8 +48,8 @@ export class ExpenseDao {
 
 
 
-  async findAllExpenses(startDate?: string, endDate?: string, filter?: string): Promise<Expense[]> {
-    const whereClause: any = {};
+  async findAllExpenses(userId: string, startDate?: string, endDate?: string, filter?: string): Promise<Expense[]> {
+    const whereClause: any = { user_id: userId };
     if (startDate && endDate) {
       whereClause.date = { $between: [startDate, endDate] };
     }
@@ -58,20 +59,32 @@ export class ExpenseDao {
     return this.expenseModel.findAll({ where: whereClause });
   }
 
-  async findExpenseById(id: string): Promise<Expense> {
-    return this.expenseModel.findByPk(id);
+  async findExpenseById(userId: string, id: string): Promise<Expense> {
+    const whereClause: any = {
+      user_id: userId,
+      id
+    };
+    return this.expenseModel.findOne({ where: whereClause });
   }
 
-  async updateExpense(id: string, updateExpenseDto: UpdateExpenseDto): Promise<Expense | null> {
-    const expense = await this.expenseModel.findByPk(id);
+  async updateExpense(userId:string, id: string, updateExpenseDto: UpdateExpenseDto): Promise<Expense | null> {
+    const whereClause: any = {
+      user_id: userId,
+      id
+    };
+    const expense = await this.expenseModel.findOne({where:whereClause});
 
     if (!expense) return null; // Expense not found
 
     return expense.update(updateExpenseDto); // This updates and returns the updated instance
   }
 
-  async deleteExpense(id: string): Promise<boolean> {
-    const expense = await this.expenseModel.findByPk(id);
+  async deleteExpense(userId:string,id: string): Promise<boolean> {
+    const whereClause: any = {
+      user_id: userId,
+      id
+    };
+    const expense = await this.expenseModel.findOne({where:whereClause});
 
     if (!expense) return false; // Expense not found
 
@@ -80,9 +93,9 @@ export class ExpenseDao {
   }
 
 
-  async deleteExpensesByFileId(fileId: string, options?: any): Promise<boolean> {
+  async deleteExpensesByFileId(userId:string,fileId: string, options?: any): Promise<boolean> {
     const deletedCount = await this.expenseModel.destroy({
-      where: { file_id: fileId },
+      where: { file_id: fileId,user_id:userId },
       ...options, // Pass options to support transactions
     });
 
@@ -91,35 +104,37 @@ export class ExpenseDao {
 
   //new code for chart query
   // Method to get expenses grouped by date with offset and file_id
-  async getExpensesGroupedByDateWithOffset(offset: number = 0, file_id: string | null): Promise<any[]> {
+  async getExpensesGroupedByDateWithOffset(userId:string, offset: number = 0, file_id: string | null): Promise<any[]> {
     // Calculate the limit based on the offset (1 offset = 7 days)
     const limit = 7;
 
     return await this.expenseModel.findAll({
-        attributes: [
-            [sequelize.literal('CONVERT(DATE, [date])'), 'date'],
-            [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
-        ],
-        where: {
-             file_id: file_id  // Include file_id filter if provided
-        },
-        group: ['date'],
-        order: [['date', 'ASC']], // Order by date in ascending order
-        limit: limit, // Limit to the last 7 entries based on offset
-        offset: offset * limit, // Apply offset in multiples of limit (7)
+      attributes: [
+        [sequelize.literal('CONVERT(DATE, [date])'), 'date'],
+        [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
+      ],
+      where: {
+        file_id: file_id,  // Include file_id filter if provided
+        user_id : userId
+      },
+      group: ['date'],
+      order: [['date', 'ASC']], // Order by date in ascending order
+      limit: limit, // Limit to the last 7 entries based on offset
+      offset: offset * limit, // Apply offset in multiples of limit (7)
     });
-}
+  }
 
 
   // 2. Group by Category
-  async getExpensesGroupedByCategory(startDate: string | null, endDate: string | null, file_id: string | null): Promise<any[]> {
+  async getExpensesGroupedByCategory(userId:string,startDate: string | null, endDate: string | null, file_id: string | null): Promise<any[]> {
     const start = startDate ? new Date(startDate) : moment().subtract(7, 'days').toDate();
     const end = endDate ? new Date(endDate) : new Date();
 
     return await this.expenseModel.findAll({
       where: {
         date: { [Op.between]: [start, end] },
-        file_id: file_id
+        file_id: file_id,
+        user_id : userId
       },
       attributes: [
         'category',
@@ -131,7 +146,7 @@ export class ExpenseDao {
   }
 
   // 3. Group by Week
-  async getExpensesGroupedByWeek(month: number, year: number, file_id: string | null): Promise<any[]> {
+  async getExpensesGroupedByWeek(userId:string,month: number, year: number, file_id: string | null): Promise<any[]> {
     console.log(year, month, file_id);
     return await this.expenseModel.sequelize.query(`
       SELECT 
@@ -141,45 +156,45 @@ export class ExpenseDao {
         (DATEPART(DAY, [date]) - 1) / 7 + 1 AS [week], 
         SUM([amount]) AS [total_amount]
       FROM [expenses]
-      WHERE DATEPART(YEAR, [date]) = :year AND DATEPART(MONTH, [date]) = :month AND (file_id = :file_id OR :file_id IS NULL)
+      WHERE DATEPART(YEAR, [date]) = :year AND DATEPART(MONTH, [date]) = :month AND (file_id = :file_id OR :file_id IS NULL) AND user_id = :userId
       GROUP BY DATEPART(YEAR, [date]), DATEPART(MONTH, [date]), (DATEPART(DAY, [date]) - 1) / 7 + 1
       ORDER BY [week] ASC;
     `, {
-      replacements: { month, year, file_id },
+      replacements: { month, year, file_id , userId},
       type: QueryTypes.SELECT,
     });
-}
+  }
 
 
   // 4. Group by Month
-  async getExpensesGroupedByMonth(year: number, file_id: string | null): Promise<any[]> {
+  async getExpensesGroupedByMonth(userId:string,year: number, file_id: string | null): Promise<any[]> {
     return await this.expenseModel.sequelize.query(`
       SELECT 
         DATEPART(YEAR, [date]) AS [year], 
         DATEPART(MONTH, [date]) AS [month], 
         SUM([amount]) AS [total_amount]
       FROM [expenses]
-      WHERE DATEPART(YEAR, [date]) = :year AND (file_id = :file_id OR :file_id IS NULL)
+      WHERE DATEPART(YEAR, [date]) = :year AND (file_id = :file_id OR :file_id IS NULL) AND user_id = :userId
       GROUP BY DATEPART(YEAR, [date]), DATEPART(MONTH, [date])
       ORDER BY DATEPART(MONTH, [date]) ASC;
     `, {
-      replacements: { year, file_id },
+      replacements: { year, file_id ,userId},
       type: QueryTypes.SELECT,
     });
   }
 
   // 5. Group by Year
-  async getExpensesGroupedByYear(file_id: string | null): Promise<any[]> {
+  async getExpensesGroupedByYear(userId:string, file_id: string | null): Promise<any[]> {
     return await this.expenseModel.sequelize.query(`
       SELECT 
         DATEPART(YEAR, [date]) AS [year], 
         SUM([amount]) AS [total_amount]
       FROM [expenses]
-      WHERE (file_id = :file_id OR :file_id IS NULL)
+      WHERE (file_id = :file_id OR :file_id IS NULL) AND user_id = :userId
       GROUP BY DATEPART(YEAR, [date])
       ORDER BY [year] ASC;
     `, {
-      replacements: { file_id },
+      replacements: { file_id, userId },
       type: QueryTypes.SELECT,
     });
   }
