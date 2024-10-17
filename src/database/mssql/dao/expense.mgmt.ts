@@ -132,22 +132,24 @@ export class ExpenseDao {
 
   // 3. Group by Week
   async getExpensesGroupedByWeek(month: number, year: number, file_id: string | null): Promise<any[]> {
-    console.log(year,month,file_id)
+    console.log(year, month, file_id);
     return await this.expenseModel.sequelize.query(`
       SELECT 
         DATEPART(YEAR, [date]) AS [year], 
         DATEPART(MONTH, [date]) AS [month], 
-        DATEPART(WEEK, [date]) AS [week], 
+        -- Calculate the week number in the month
+        (DATEPART(DAY, [date]) - 1) / 7 + 1 AS [week], 
         SUM([amount]) AS [total_amount]
       FROM [expenses]
       WHERE DATEPART(YEAR, [date]) = :year AND DATEPART(MONTH, [date]) = :month AND (file_id = :file_id OR :file_id IS NULL)
-      GROUP BY DATEPART(YEAR, [date]), DATEPART(MONTH, [date]), DATEPART(WEEK, [date])
-      ORDER BY DATEPART(WEEK, [date]) ASC;
+      GROUP BY DATEPART(YEAR, [date]), DATEPART(MONTH, [date]), (DATEPART(DAY, [date]) - 1) / 7 + 1
+      ORDER BY [week] ASC;
     `, {
       replacements: { month, year, file_id },
       type: QueryTypes.SELECT,
     });
-  }
+}
+
 
   // 4. Group by Month
   async getExpensesGroupedByMonth(year: number, file_id: string | null): Promise<any[]> {
