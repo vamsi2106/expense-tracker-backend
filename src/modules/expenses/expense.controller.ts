@@ -5,7 +5,7 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Controller('expenses')
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(private readonly expenseService: ExpenseService) { }
 
   @Post()
   async create(@Body() createExpenseDto: CreateExpenseDto) {
@@ -26,11 +26,11 @@ export class ExpenseController {
   async findOne(@Param('id') id: string) {
     let data = this.expenseService.findOne(id);
 
-    if(!data){
+    if (!data) {
       throw new HttpException(
-        {status : HttpStatus.NOT_FOUND, error: "Expense with the given Id does not exist"},HttpStatus.NOT_FOUND
+        { status: HttpStatus.NOT_FOUND, error: "Expense with the given Id does not exist" }, HttpStatus.NOT_FOUND
       )
-    }else{
+    } else {
       return data;
     }
   }
@@ -38,14 +38,14 @@ export class ExpenseController {
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
     const updatedExpense = await this.expenseService.update(id, updateExpenseDto);
-    
+
     if (!updatedExpense) {
       throw new HttpException(
         { status: HttpStatus.NOT_FOUND, error: 'Expense not found or update failed' },
         HttpStatus.NOT_FOUND,
       );
     }
-    
+
     return {
       status: 'success',
       message: 'Expense updated successfully',
@@ -56,7 +56,7 @@ export class ExpenseController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const result = await this.expenseService.remove(id);
-    
+
     if (!result) {
       throw new HttpException(
         { status: HttpStatus.NOT_FOUND, error: 'Expense not found or deletion failed' },
@@ -69,4 +69,64 @@ export class ExpenseController {
       message: 'Expense deleted successfully',
     };
   }
+
+  //querry code
+ // 1. Group by Date with Offset
+@Get('filter/group-by-date')
+async getExpensesGroupedByDate(
+  @Query('offset') offset: number,
+  @Query('file_id') file_id?: string // Optional file_id
+) {
+  const defaultFileId = file_id ?? null; // Ensure file_id defaults to null
+  return await this.expenseService.getExpensesGroupedByDateWithOffset(offset, defaultFileId);
+}
+
+// 2. Group by Category
+@Get('filter/group-by-category')
+async getExpensesGroupedByCategory(
+  @Query('startDate') startDate?: string,
+  @Query('endDate') endDate?: string,
+  @Query('file_id') file_id?: string // Optional file_id
+) {
+  const defaultFileId = file_id ?? null; // Ensure file_id defaults to null
+  return await this.expenseService.getExpensesGroupedByCategory(defaultFileId, startDate, endDate);
+}
+
+// 3. Group by Week
+@Get('filter/group-by-week')
+async getExpensesGroupedByWeek(
+  @Query('month') month?: number,  // Optional parameter
+  @Query('year') year?: number,    // Optional parameter
+  @Query('file_id') file_id?: string // Optional file_id
+) {
+  const currentDate = new Date();
+  const defaultMonth = month ?? currentDate.getMonth() + 1; // Default to current month
+  const defaultYear = year ?? currentDate.getFullYear();    // Default to current year
+  const defaultFileId = file_id ?? null; // Ensure file_id defaults to null
+
+  return await this.expenseService.getExpensesGroupedByWeek(defaultMonth, defaultYear, defaultFileId);
+}
+
+// 4. Group by Month
+@Get('filter/group-by-month')
+async getExpensesGroupedByMonth(
+  @Query('year') year?: number,    // Optional query parameter for year
+  @Query('file_id') file_id?: string // Optional file_id
+) {
+  const currentDate = new Date();
+  const defaultYear = year ?? currentDate.getFullYear();   // Default to current year
+  const defaultFileId = file_id ?? null;                   // Ensure file_id defaults to null
+
+  return await this.expenseService.getExpensesGroupedByMonth(defaultFileId, defaultYear);
+}
+
+// 5. Group by Year
+@Get('filter/group-by-year')
+async getExpensesGroupedByYear(
+  @Query('file_id') file_id?: string // Optional file_id
+) {
+  const defaultFileId = file_id ?? null; // Ensure file_id defaults to null
+  return await this.expenseService.getExpensesGroupedByYear(defaultFileId);
+}
+
 }

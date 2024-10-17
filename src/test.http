@@ -7,12 +7,21 @@ POST http://localhost:5000/users
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
+    "username":"E R Nagasritha",
+    "email":"nagasritha.er@g7cr.com",
+=======
     "username":"Vamsi",
     "email":"nagasai.vamsi@g7cr.com",
     "userImageUrl": "https://res-console.cloudinary.com/dtyiomktp/media_explorer_thumbnails/4a409a80f067cb76779f36916711ec68/detailed",
+>>>>>>> b404fed4c79af14084ef7eb43320ca820cd4adf9
     "role":"admin"
 }
 
 ###
+<<<<<<< HEAD
+DELETE http://localhost:5000/users/remove/5a0bcabf-afa1-459c-9db8-df3f58574df3	
+=======
 DELETE http://localhost:5000/users/remove/b5bb056e-0325-4ffc-abd1-5b25aba053e4
+>>>>>>> b404fed4c79af14084ef7eb43320ca820cd4adf9
 //Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjZjODNlOC0wZDdlLTQ4NWMtOTQ3ZC1lMTNjMTQwYmQ4NDAiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjpudWxsLCJlbWFpbCI6Im5hZ2FzYWkudmFtc2lAZzdjci5jb20iLCJyb2xlIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTE0VDE2OjU0OjIzLjQyM1oiLCJpYXQiOjE3MjkwMjMxODEsImV4cCI6MTcyOTAyNjc4MX0.86WO88d3BO4rLXpJm9IZtUjcfs5r41DOYie6VFVFrlU

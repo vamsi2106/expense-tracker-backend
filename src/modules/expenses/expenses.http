@@ -7,6 +7,7 @@ Accept: application/json
 
 GET {{url}}/6df572fd-916d-461b-8cee-2c77fd994eea
 Accept: application/json
+###
 
 //to fetch expenses from start-date to end date
 GET {{url}}?startDate=2024-10-01&endDate=2024-10-14
@@ -23,9 +24,9 @@ Content-type:application/json
 {
     "email" : "ernagasritha@gmail.com",
     "amount" : 2000,
-    "date" : "2024-10-12",
-    "name" : "Isha foundation trip",
-    "category" : "Transport"
+    "date" : "2024-9-13",
+    "name" : "Hospetal charges",
+    "category" : "Utilities"
 }
 ###
 
@@ -40,3 +41,21 @@ Content-Type: application/json
 
 //to delete the column
 DELETE {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
+###
+
+GET {{url}}/filter/group-by-date?offset=0
+###
+
+GET {{url}}/filter/group-by-category?startDate=2024-10-01&endDate=2024-10-07
+###
+
+GET {{url}}/filter/group-by-category?file_id=9344874e-5f5b-4083-a919-cdf3d298f117
+###
+
+GET {{url}}/filter/group-by-week
+###
+
+GET {{url}}/filter/group-by-month
+###
+
+GET {{url}}/filter/group-by-year
