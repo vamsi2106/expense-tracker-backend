@@ -38,24 +38,27 @@ export class ExpenseService {
 
   //querry code
   // Service method to call DAO for expenses grouped by date with offset
-  async getExpensesGroupedByDateWithOffset(offset: number = 0) {
-    return this.expenseDao.getExpensesGroupedByDateWithOffset(offset);
+  async getExpensesGroupedByDateWithOffset(offset: number, file_id: string | null) {
+    return await this.expenseDao.getExpensesGroupedByDateWithOffset(offset, file_id);
   }
 
-  // Service method to call DAO for expenses grouped by category
-  async getExpensesGroupedByCategory(startDate?: string, endDate?: string) {
-    return this.expenseDao.getExpensesGroupedByCategory(startDate, endDate);
+  // 2. Group by Category
+  async getExpensesGroupedByCategory(file_id: string | null, startDate?: string, endDate?: string) {
+    return await this.expenseDao.getExpensesGroupedByCategory(startDate, endDate, file_id);
   }
 
-  async getExpensesGroupedByWeek(month:number,year:number){
-    return this.expenseDao.getExpensesGroupedByWeek(month,year);
-  }
-  async getExpensesGroupedByMonth(year?: number) {
-    return this.expenseDao.getExpensesGroupedByMonth(year);
+  // 3. Group by Week
+  async getExpensesGroupedByWeek(month: number, year: number, file_id: string | null) {
+    return await this.expenseDao.getExpensesGroupedByWeek(month, year, file_id);
   }
 
-  async getExpensesGroupedByYear(): Promise<any[]> {
-    return this.expenseDao.getExpensesGroupedByYear();
-}
+  // 4. Group by Month
+  async getExpensesGroupedByMonth(file_id: string | null, year: number) {
+    return await this.expenseDao.getExpensesGroupedByMonth(year, file_id);
+  }
 
+  // 5. Group by Year
+  async getExpensesGroupedByYear(file_id: string | null) {
+    return await this.expenseDao.getExpensesGroupedByYear(file_id);
+  }
 }

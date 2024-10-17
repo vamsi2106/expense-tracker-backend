@@ -49,7 +49,7 @@ GET {{url}}/filter/group-by-date?offset=0
 GET {{url}}/filter/group-by-category?startDate=2024-10-01&endDate=2024-10-07
 ###
 
-GET {{url}}/filter/group-by-category
+GET {{url}}/filter/group-by-category?file_id=9344874e-5f5b-4083-a919-cdf3d298f117
 ###
 
 GET {{url}}/filter/group-by-week
