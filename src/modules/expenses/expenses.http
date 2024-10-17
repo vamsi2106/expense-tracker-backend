@@ -24,9 +24,9 @@ Content-type:application/json
 {
     "email" : "ernagasritha@gmail.com",
     "amount" : 2000,
-    "date" : "2024-10-13",
-    "name" : "Isha foundation trip",
-    "category" : "Transport"
+    "date" : "2024-9-13",
+    "name" : "Hospetal charges",
+    "category" : "Utilities"
 }
 ###
 

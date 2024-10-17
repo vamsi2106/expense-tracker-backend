@@ -92,22 +92,24 @@ export class ExpenseDao {
   //new code for chart query
   // Method to get expenses grouped by date with offset and file_id
   async getExpensesGroupedByDateWithOffset(offset: number = 0, file_id: string | null): Promise<any[]> {
-    const end = moment().subtract(offset * 7, 'days').toDate();
-    const start = moment(end).subtract(7, 'days').toDate();
+    // Calculate the limit based on the offset (1 offset = 7 days)
+    const limit = 7;
 
     return await this.expenseModel.findAll({
-      attributes: [
-        [sequelize.literal('CONVERT(DATE, [date])'), 'date'],
-        [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
-      ],
-      where: {
-        date: { [Op.between]: [start, end] },
-        file_id: file_id // Always include file_id, even if null
-      },
-      group: ['date'],
-      order: [['date', 'ASC']],
+        attributes: [
+            [sequelize.literal('CONVERT(DATE, [date])'), 'date'],
+            [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
+        ],
+        where: {
+             file_id: file_id  // Include file_id filter if provided
+        },
+        group: ['date'],
+        order: [['date', 'ASC']], // Order by date in ascending order
+        limit: limit, // Limit to the last 7 entries based on offset
+        offset: offset * limit, // Apply offset in multiples of limit (7)
     });
-  }
+}
+
 
   // 2. Group by Category
   async getExpensesGroupedByCategory(startDate: string | null, endDate: string | null, file_id: string | null): Promise<any[]> {
