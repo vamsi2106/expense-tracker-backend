@@ -32,7 +32,7 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: true,
   })
-  userImageUrl: string;
+  userImageUrl: any;
 
   @Column({
     type: DataType.STRING,

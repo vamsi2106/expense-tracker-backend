@@ -12,4 +12,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   role?: Role;
+
+  userImageUrl?: string;
 }
