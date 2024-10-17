@@ -11,26 +11,26 @@ let categoriesList =[
   'Maintenance',
   'Office Expenses',
   'Events',
+  'Others',
 ]
-export class UpdateExpenseDto {
-  @IsOptional()
+export class CreateExpenseDtoTemp {
   @IsString()
-  name?: string;
+  @IsNotEmpty()
+  name: string;
 
-  @IsOptional()
   @IsString()
-  user_id?: string;
+  @IsNotEmpty()
+  user_id: string;
 
-  @IsOptional()
   @IsNumber()
-  amount?: number;
+  @IsNotEmpty()
+  amount: number;
 
-  @IsOptional()
   @IsDate()
   @Type(()=>Date)
-  date?: Date;
+  @IsNotEmpty()
+  date: Date;
 
-  @IsOptional()
   @IsString()
   @IsIn([
     'Food',
@@ -42,7 +42,10 @@ export class UpdateExpenseDto {
     'Maintenance',
     'Office Expenses',
     'Events',
-    'Others'
   ], { message: `Invalid category, only these values are allowed : ${categoriesList}` })
-  category?: string;
+  category: string;
+
+  @IsString()
+  @IsOptional()
+  file_id ?: string;
 }

@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import { User } from './user.model';
 
 @Table({ tableName: 'files' })
 export class File extends Model {
@@ -6,6 +7,10 @@ export class File extends Model {
   @Default(DataType.UUIDV4)
   @Column({ type: DataType.UUID })
   id: string;
+
+  @ForeignKey(() => User)
+  @Column({ type: DataType.STRING, allowNull: false })
+  user_id: string;
 
   @Column({ type: DataType.STRING, unique : true, allowNull: false })
   originalFileName: string; // Stores the original name of the uploaded file
