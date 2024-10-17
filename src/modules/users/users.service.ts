@@ -12,9 +12,15 @@ export class UsersService {
     username: string,
     email: string,
     role?: Role,
+    userImageUrl?: any,
   ): Promise<User> {
     try {
-      const user = await this.userDao.createUser(username, email, role);
+      const user = await this.userDao.createUser(
+        username,
+        email,
+        role,
+        userImageUrl,
+      );
       return user; // Return the created user
     } catch (error) {
       console.error('Error creating user:', error);

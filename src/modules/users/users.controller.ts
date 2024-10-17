@@ -26,9 +26,15 @@ export class UsersController {
     private readonly emailService: EmailService,
   ) {}
 
+  @Post()
+  async create(@Body() body: { username: string; email: string; role?: Role }) {
+    return this.userService.createUser(body.username, body.email, body.role);
+  }
+
   @Post('check-email')
   async checkEmail(@Body('email') email: string) {
     const user = await this.userService.findUserByEmail(email);
+    console.log('BE', user);
     return { userFound: !!user }; // Return true if user exists, false otherwise
   }
 
@@ -46,10 +52,18 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @Req() req: Request,
   ) {
-    const { username, email, role } = createUserDto;
+    console.log('Received data:', createUserDto);
+    const { username, email, role, userImageUrl } = createUserDto;
 
     // Create the user in the database
-    const user = await this.userService.createUser(username, email, role);
+    const user = await this.userService.createUser(
+      username,
+      email,
+      role,
+      userImageUrl,
+    );
+
+    console.log('user created details BE', user);
 
     // Generate a login link or invitation link
     // const invitationLink = `http://localhost:3000/login`; // Generate a token or unique link

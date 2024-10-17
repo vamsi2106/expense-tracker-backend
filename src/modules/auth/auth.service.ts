@@ -62,6 +62,7 @@ export class AuthService {
         tokenResponse.data.access_token,
       );
       const user = await this.userService.findUserByEmail(userDetails.mail);
+      console.log('payload return', user);
 
       if (!user) {
         // User not found, return an error message to the frontend
@@ -72,8 +73,9 @@ export class AuthService {
 
       return {
         token: customToken,
+        userid: user.userId,
         username: user.username,
-        profileImage: user.userImageUrl,
+        userImageUrl: user.userImageUrl,
         role: user.role,
         userEmail: user.email,
       };
