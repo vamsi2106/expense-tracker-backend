@@ -5,6 +5,9 @@ GET {{url}}/
 Accept: application/json
 ###
 
+GET {{url}}/6df572fd-916d-461b-8cee-2c77fd994eea
+Accept: application/json
+
 //to fetch expenses from start-date to end date
 GET {{url}}?startDate=2024-10-01&endDate=2024-10-14
 ###

@@ -20,9 +20,9 @@ export class ExpenseService {
     return this.expenseDao.findAllExpenses(startDate, endDate, filter);
   }
 
-  // findOne(id: string) {
-  //   return this.expenseDao.findExpenseById(id);
-  // }
+  findOne(id: string) {
+    return this.expenseDao.findExpenseById(id);
+  }
 
   update(id: string, updateExpenseDto: UpdateExpenseDto) {
     return this.expenseDao.updateExpense(id, updateExpenseDto);
