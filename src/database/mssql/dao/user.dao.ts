@@ -12,9 +12,10 @@ export class UserDao {
     username: string,
     email: string,
     role?: Role,
+    userImageUrl?: any,
   ): Promise<User> {
-    console.log('Creating user:', username, email, role);
-    return await this.userModel.create({ username, email, role });
+    console.log('Creating user DAO:', username, email, role, userImageUrl);
+    return await this.userModel.create({ username, email, role, userImageUrl });
   }
 
   async findAll(): Promise<User[]> {
