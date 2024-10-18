@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { DbModule } from '../../database/database.module';
 import { ExpenseModule } from '../expenses/expense.module';
 import { FileModule } from '../files/files.modules';
+import { AppLogger } from 'src/logger/app-logger';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { FileModule } from '../files/files.modules';
     FileModule
   ],
   controllers: [AppController],
-  providers: [AppService],
-  exports: [AppService],
+  providers: [AppService,AppLogger],
+  exports: [AppService,AppLogger],
 })
 export class AppModule {}

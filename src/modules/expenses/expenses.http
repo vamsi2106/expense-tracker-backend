@@ -23,10 +23,10 @@ Content-type:application/json
 
 {
     "user_id" : "0b21908b-b55f-47b5-b33f-c7f4ebe61b53",
-    "amount" : 2000,
+    "amount" : 10000,
     "date" : "2024-9-13",
-    "name" : "Hospetal charges",
-    "category" : "Utilities"
+    "name" : "Kukke trip",
+    "category" : "Transport"
 }
 ###
 
