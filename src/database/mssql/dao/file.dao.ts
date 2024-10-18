@@ -17,16 +17,18 @@ export class FileDao {
   }
   
 
-  async findById(id: string): Promise<File> {
-    return this.fileModel.findByPk(id);
+  async findById(userId:string,id: string): Promise<File> {
+    return this.fileModel.findOne({where : {id, user_id : userId}});
   }
 
-  async findAll(): Promise<File[]> {
-    return this.fileModel.findAll();
+  async findAll(userId:string): Promise<File[]> {
+    let whereClause = {user_id : userId}
+    return this.fileModel.findAll({where : whereClause});
   }
 
-  async deleteFile(id: string, options?: any): Promise<boolean> {
-    const file = await this.fileModel.findByPk(id);
+  async deleteFile(userId:string, id: string, options?: any): Promise<boolean> {
+    
+    const file = await this.fileModel.findOne({where : {id, user_id : userId}});
     
     if (!file) {
       return false; // File not found

@@ -11,6 +11,7 @@ let categoriesList =[
   'Maintenance',
   'Office Expenses',
   'Events',
+  'Others',
 ]
 export class CreateExpenseDto {
   @IsString()
@@ -19,7 +20,7 @@ export class CreateExpenseDto {
 
   @IsString()
   @IsNotEmpty()
-  email: string;
+  user_id: string;
 
   @IsNumber()
   @IsNotEmpty()
