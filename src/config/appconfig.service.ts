@@ -13,6 +13,7 @@ export class ConfigServices {
   private readonly blobConnectionString : string;
   private readonly appContainerName : string;
   private readonly logContainerName : string;
+  private readonly servicePort : string;
 
   constructor() {
     this.host = process.env.MSSQL_HOST;
@@ -23,8 +24,13 @@ export class ConfigServices {
     this.domain = process.env.MySQL_Domain || ''; // Domain for Windows Authentication
     this.serverPort = parseInt(process.env.Server_Port,10);
     this.blobConnectionString = process.env.AZURE_BLOB_CONNECTION_STRING;
-    this.appContainerName = process.env.AZURE_APP_CONTAINER_NAME
-    this.logContainerName = process.env.AZURE_LOG_CONTAINER_NAME
+    this.appContainerName = process.env.AZURE_APP_CONTAINER_NAME;
+    this.logContainerName = process.env.AZURE_LOG_CONTAINER_NAME;
+    this.servicePort = process.env.Server_Port;
+  }
+
+  getServicePort() : string{
+    return this.servicePort;
   }
 
   getHost(): string {

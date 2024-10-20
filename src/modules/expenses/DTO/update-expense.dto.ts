@@ -1,48 +1,55 @@
 import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { CategoriesList } from 'src/modules/categories/DTO/createCategory.dto';
 
-let categoriesList =[
-  'Food',
-  'Entertainment',
-  'Taxes',
-  'Transport',
-  'Utilities',
-  'Equipment',
-  'Maintenance',
-  'Office Expenses',
-  'Events',
-]
 export class UpdateExpenseDto {
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The name of the expense (Optional)',
+    example: 'Office Supplies',
+  })
   @IsString()
+  @IsOptional()
   name?: string;
 
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The ID of the user who created the expense (Optional)',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @IsString()
+  @IsOptional()
   user_id?: string;
 
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The amount of the expense (Optional)',
+    example: 300.00,
+  })
   @IsNumber()
+  @IsOptional()
   amount?: number;
 
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The date of the expense transaction (Optional)',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   @IsDate()
-  @Type(()=>Date)
+  @Type(() => Date)
+  @IsOptional()
   date?: Date;
 
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: `The category of the expense (Optional). Valid options: ${CategoriesList.join(', ')}`,
+    example: 'Equipment',
+  })
   @IsString()
-  @IsIn([
-    'Food',
-    'Entertainment',
-    'Taxes',
-    'Transport',
-    'Utilities',
-    'Equipment',
-    'Maintenance',
-    'Office Expenses',
-    'Events',
-    'Others'
-  ], { message: `Invalid category, only these values are allowed : ${categoriesList}` })
+  @IsOptional()
   category?: string;
+
+  @ApiPropertyOptional({
+    description: 'The file ID for an associated receipt or document (Optional)',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsString()
+  @IsOptional()
+  file_id?: string;
 }

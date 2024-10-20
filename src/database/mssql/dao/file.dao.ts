@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { File } from '../models/file.model';
+import { File } from '../models/file.models';
 
 @Injectable()
 export class FileDao {

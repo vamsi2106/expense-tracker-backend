@@ -64,7 +64,7 @@
 // }
 
 import { Injectable } from '@nestjs/common';
-import { ExpenseDao } from 'src/database/mssql/dao/expense.mgmt';
+import { ExpenseDao } from 'src/database/mssql/dao/expenses.dao';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
@@ -72,14 +72,18 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 export class ExpenseService {
   constructor(private readonly expenseDao: ExpenseDao) {}
 
+  // async get(name:string){
+  //   return this.expenseDao.get(name);
+  // }
+
   // Creating a new expense, ensuring it is tied to a specific user
-  async create(expenseData: CreateExpenseDto, options?: any) {
-    return this.expenseDao.createExpense(expenseData, options);
+  async create(expenseData: CreateExpenseDto, userId:string, options?: any) {
+    return this.expenseDao.createExpense(expenseData, userId, options);
   }
 
   // Fetching all expenses for a specific user, with optional date filtering
-  findAll(userId: string, startDate?: string, endDate?: string, filter?: string) {
-    return this.expenseDao.findAllExpenses(userId, startDate, endDate, filter);
+  findAll(userId: string, startDate?: string, endDate?: string, filter?: string, transactionType?:string,currency?:string,limit?:number,offset?:number) {
+    return this.expenseDao.findAllExpenses(userId, startDate, endDate, filter, transactionType,currency,limit,offset);
   }
 
   // Fetching a specific expense by ID for a specific user
@@ -125,7 +129,7 @@ export class ExpenseService {
   }
 
   // Group by year
-  async getExpensesGroupedByYear(userId: string, file_id: string | null) {
-    return await this.expenseDao.getExpensesGroupedByYear(userId, file_id);
-  }
+  // async getExpensesGroupedByYear(userId: string, file_id: string | null) {
+  //   return await this.expenseDao.getExpensesGroupedByYear(userId, file_id);
+  // }
 }
