@@ -1,51 +1,45 @@
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsDate, IsOptional, IsString, IsNumber, IsDateString, IsEnum } from 'class-validator';
+//import { IsDate } from 'sequelize-typescript';
 
-let categoriesList =[
-  'Food',
-  'Entertainment',
-  'Taxes',
-  'Transport',
-  'Utilities',
-  'Equipment',
-  'Maintenance',
-  'Office Expenses',
-  'Events',
-  'Others',
-]
+// Define an enum for transaction types if it has fixed values
+export enum TransactionType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
+}
+
 export class CreateExpenseDto {
-  @IsString()
   @IsNotEmpty()
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  user_id: string;
-
   @IsNumber()
-  @IsNotEmpty()
   amount: number;
 
+  
   @IsDate()
-  @Type(()=>Date)
+  @Type(() => Date)
   @IsNotEmpty()
   date: Date;
 
+  @IsNotEmpty()
   @IsString()
-  @IsIn([
-    'Food',
-    'Entertainment',
-    'Taxes',
-    'Transport',
-    'Utilities',
-    'Equipment',
-    'Maintenance',
-    'Office Expenses',
-    'Events',
-  ], { message: `Invalid category, only these values are allowed : ${categoriesList}` })
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
   category: string;
 
+  @IsNotEmpty()
+  @IsEnum(TransactionType)  // Use enum if transaction types are fixed
+  transaction_type: TransactionType;
+
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  file_id ?: string;
+  currency: string;
+
+  @IsOptional() // This makes file_id optional
+  @IsString()
+  file_id?: string; // Make sure this field is optional
+
+  @IsOptional() // Description is also optional
+  @IsString()
+  description?: string;
 }

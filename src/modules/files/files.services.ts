@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { FileDao } from 'src/database/mssql/dao/file.dao';
-import { File } from 'src/database/mssql/models/file.model';
+import { File } from 'src/database/mssql/models/file.models';
 import * as csvParser from 'csv-parser';
 import { CreateExpenseDto } from '../expenses/dto/create-expense.dto';
 import { ExpenseService } from '../expenses/expense.service';
@@ -61,17 +61,20 @@ export class FileService {
         .on('data', (row) => {
           const expenseData: CreateExpenseDto = {
             name: row.name,
-            user_id: userId,
+            // user_id: userId,
             amount: parseFloat(row.amount),
             date: new Date(row.date),
             category: row.category,
+            description:row.description,
+            transaction_type : row.transaction_type,
+            currency : row.currency,
             file_id: fileId, // Assign file_id to the expense
           };
   
           console.log("Processing expense row: ", expenseData);
   
           expensePromises.push(
-            this.expenseService.create(expenseData, { transaction })
+            this.expenseService.create(expenseData, userId, { transaction })
           );
         })
         .on('end', async () => {

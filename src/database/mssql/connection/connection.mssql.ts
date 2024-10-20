@@ -1,5 +1,6 @@
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SchemasList } from './schemas.mssql';
 
 export const DatabaseConfigService = SequelizeModule.forRootAsync({
   imports: [ConfigModule],
@@ -24,6 +25,7 @@ export const DatabaseConfigService = SequelizeModule.forRootAsync({
         enableArithAbort: true, // Required for certain configurations
       },
     },
+    models:[...SchemasList],
     autoLoadModels: true,
     synchronize: true, // Use with caution in production; consider migrations instead
   }),

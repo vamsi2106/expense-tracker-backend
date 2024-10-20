@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { File } from 'src/database/mssql/models/file.model';
+import { File } from 'src/database/mssql/models/file.models';
 import { FileDao } from 'src/database/mssql/dao/file.dao';
 import { FileService } from './files.services';
 import { FileController } from './files.controllers';

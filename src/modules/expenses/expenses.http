@@ -1,39 +1,49 @@
-@url = http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/expenses
+@url = http://localhost:5000/tracker/expenses
+
 
 //to fetch all details
-GET {{url}}/
+GET {{url}}
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MjI3NzA2LCJleHAiOjE3MjkyMzEzMDZ9.NOwqLXNRCRRJhlo1c77dps4hupYtAnIgejOakqkKbCc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzM0NjE4LCJleHAiOjE3Mjk0MjEwMTh9.JP7Y3NzQqfTfSw5vl1umwCaR1gNDBpq92Tgj6ug-4TM
 ###
 
-GET {{url}}/0a421d2c-1a2c-4f9b-8315-62c850c4a2a7
+GET {{url}}/331f5201-d4be-4c8d-a916-6da329c4c428
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzM0NjE4LCJleHAiOjE3Mjk0MjEwMTh9.JP7Y3NzQqfTfSw5vl1umwCaR1gNDBpq92Tgj6ug-4TM
+
 ###
 
 //to fetch expenses from start-date to end date
 GET {{url}}?startDate=2024-10-01&endDate=2024-10-14
 ###
 
+
+
 //to fetch the data related to the category
 GET {{url}}?filter=Transport
 Accept: application/json
 ###
 
-POST  http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/expenses
+POST  {{url}}
 Content-type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
 
 {
-    "user_id" : "0b21908b-b55f-47b5-b33f-c7f4ebe61b53",
-    "amount" : 10000,
-    "date" : "2024-9-13",
-    "name" : "Kukke trip",
-    "category" : "Transport"
+    "amount": 10000,
+    "date": "2024-09-13",
+    "name": "Kukke , Darmasthala ",
+    "category": "Transport charges",
+    "transaction_type": "expense",
+    "currency": "INR",
+    "description": "it is for testing purpose"
 }
+
 ###
 
 //to update the db
-PUT {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
+PUT {{url}}/331f5201-d4be-4c8d-a916-6da329c4c428
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
 
 {
     "date" : "2024-10-12"
@@ -41,22 +51,35 @@ Content-Type: application/json
 ###
 
 //to delete the column
-DELETE {{url}}/63893475-3947-4ba7-974c-095c2fa01de5
+DELETE {{url}}/331f5201-d4be-4c8d-a916-6da329c4c428
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-date?offset=0
+GET {{url}}/filter/group-by-date?offset=0&file_id=9b65ac75-226b-4293-9c2e-4ff2bf2e81bc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-category?startDate=2024-9-11&endDate=2024-10-07
+GET {{url}}/filter/group-by-category?startDate=2024-01-01&endDate=2024-12-12&file_id=9b65ac75-226b-4293-9c2e-4ff2bf2e81bc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-category?file_id=9344874e-5f5b-4083-a919-cdf3d298f117
+GET {{url}}/filter/group-by-category?file_id=9b65ac75-226b-4293-9c2e-4ff2bf2e81bc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-week?file_id=9344874e-5f5b-4083-a919-cdf3d298f117
+GET {{url}}/filter/group-by-week?month=3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-month
+GET {{url}}/filter/group-by-month?file_id=9b65ac75-226b-4293-9c2e-4ff2bf2e81bc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+
 ###
 
-GET {{url}}/filter/group-by-year
+# GET {{url}}/filter/group-by-year
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU

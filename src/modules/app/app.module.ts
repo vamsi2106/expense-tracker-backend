@@ -8,6 +8,8 @@ import { DbModule } from '../../database/database.module';
 import { ExpenseModule } from '../expenses/expense.module';
 import { FileModule } from '../files/files.modules';
 import { AppLogger } from 'src/logger/app-logger';
+import { CategoryModule } from '../categories/category.module';
+import { ExpenseTagModule } from '../expenseTags/expenseTag.module';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { AppLogger } from 'src/logger/app-logger';
     AuthModule,
     UsersModule,
     ExpenseModule,
-    FileModule
+    FileModule,
+    CategoryModule,
+    ExpenseTagModule
   ],
   controllers: [AppController],
   providers: [AppService,AppLogger],

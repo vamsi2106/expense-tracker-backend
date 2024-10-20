@@ -131,7 +131,8 @@
 
 // }
 
-import { Controller, Get, Post, Body, Param, Delete, Put, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+//last updated code
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -139,35 +140,47 @@ import { RoleGuard } from '../auth/role.guard';
 import { Roles } from '../auth/role.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard';
 import { Role } from 'src/core/enums/roles.enum';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-
-@Controller('users/:userId/expenses') // Updated path to include userId
+@ApiTags('Expenses')
+@ApiBearerAuth()
+@Controller('/tracker/expenses') // Updated path to include userId
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(private readonly expenseService: ExpenseService) { }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Post()
-  async create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expenseService.create(createExpenseDto);
+  async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req: any) {
+    let userId = (req.user.user_id);
+    console.log(userId);
+    return this.expenseService.create(createExpenseDto, userId);
   }
+
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Get()
   async findAll(
-    @Param('userId') userId: string,
+    @Req() req: any,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('filter') filter?: string,
+    @Query('transactionType') transactionType?: string,
+    @Query('currency') currency?: string,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number
   ) {
-    return this.expenseService.findAll(userId, startDate, endDate, filter);
+    let userId = req.user.user_id;
+    console.log(userId);
+    return this.expenseService.findAll(userId, startDate, endDate, filter, transactionType, currency, limit, offset);
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Get(':id')
-  async findOne(@Param('userId') userId: string, @Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    let userId = req.user.user_id;
     const data = await this.expenseService.findOne(userId, id);
 
     if (!data) {
@@ -184,10 +197,11 @@ export class ExpenseController {
   @Roles(Role.user)
   @Put(':id')
   async update(
-    @Param('userId') userId: string,
+    @Req() req: any,
     @Param('id') id: string,
     @Body() updateExpenseDto: UpdateExpenseDto,
   ) {
+    let userId = req.user.user_id
     const updatedExpense = await this.expenseService.update(userId, id, updateExpenseDto);
 
     if (!updatedExpense) {
@@ -207,7 +221,8 @@ export class ExpenseController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Delete(':id')
-  async remove(@Param('userId') userId: string, @Param('id') id: string) {
+  async remove(@Param('id') id: string, @Req() req: any) {
+    let userId = req.user.user_id
     const result = await this.expenseService.remove(userId, id);
 
     if (!result) {
@@ -223,17 +238,18 @@ export class ExpenseController {
     };
   }
 
-  // Query methods
+  //   // Query methods
 
-  // 1. Group by Date with Offset
+  //   // 1. Group by Date with Offset
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Get('filter/group-by-date')
   async getExpensesGroupedByDate(
-    @Param('userId') userId: string,
+    @Req() req: any,
     @Query('offset') offset: number,
     @Query('file_id') file_id?: string,
   ) {
+    let userId = req.user.user_id
     const defaultFileId = file_id ?? null;
     return await this.expenseService.getExpensesGroupedByDateWithOffset(userId, offset, defaultFileId);
   }
@@ -243,25 +259,29 @@ export class ExpenseController {
   @Roles(Role.user)
   @Get('filter/group-by-category')
   async getExpensesGroupedByCategory(
-    @Param('userId') userId: string,
+    @Req() req: any,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('file_id') file_id?: string,
   ) {
+    let userId = req.user.user_id
     const defaultFileId = file_id ?? null;
     return await this.expenseService.getExpensesGroupedByCategory(userId, defaultFileId, startDate, endDate);
   }
 
-  // 3. Group by Week
+
+  //   // 3. Group by Week
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.user)
   @Get('filter/group-by-week')
   async getExpensesGroupedByWeek(
-    @Param('userId') userId: string,
+    @Req() req: any,
+
     @Query('month') month?: number,
     @Query('year') year?: number,
     @Query('file_id') file_id?: string,
   ) {
+    let userId = req.user.user_id;
     const currentDate = new Date();
     const defaultMonth = month ?? currentDate.getMonth() + 1;
     const defaultYear = year ?? currentDate.getFullYear();
@@ -275,23 +295,58 @@ export class ExpenseController {
   @Roles(Role.user)
   @Get('filter/group-by-month')
   async getExpensesGroupedByMonth(
-    @Param('userId') userId: string,
+    @Req() req:any,
     @Query('year') year?: number,
     @Query('file_id') file_id?: string,
   ) {
+    let userId = req.user.user_id;
     const currentDate = new Date();
     const defaultYear = year ?? currentDate.getFullYear();
     const defaultFileId = file_id ?? null;
 
     return await this.expenseService.getExpensesGroupedByMonth(userId, defaultFileId, defaultYear);
   }
-
-  // 5. Group by Year
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
-  @Get('filter/group-by-year')
-  async getExpensesGroupedByYear(@Param('userId') userId: string, @Query('file_id') file_id?: string) {
-    const defaultFileId = file_id ?? null;
-    return await this.expenseService.getExpensesGroupedByYear(userId, defaultFileId);
-  }
 }
+
+//   // 5. Group by Year
+//   @UseGuards(JwtAuthGuard, RoleGuard)
+//   @Roles(Role.user)
+//   @Get('filter/group-by-year')
+//   async getExpensesGroupedByYear(@Param('userId') userId: string, @Query('file_id') file_id?: string) {
+//     const defaultFileId = file_id ?? null;
+//     return await this.expenseService.getExpensesGroupedByYear(userId, defaultFileId);
+//   }
+// }
+
+
+// import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+// import { ExpenseService } from "./expense.service";
+// import { CreateExpenseDto } from "./dto/create-expense.dto";
+// import { JwtAuthGuard } from "../auth/jwt-auth-guard.guard";
+// import { RoleGuard } from "../auth/role.guard";
+// import { Roles } from "../auth/role.decorator";
+// import { Role } from "src/core/enums/roles.enum";
+// @Controller('/nagasritha/nagaritha')
+// export class ExpenseController{
+//   constructor(private readonly expenseService: ExpenseService){}
+
+//   @Get()
+//   async call(){
+//     console.log('triggered');
+//     let name="nagasritha"
+//     this.expenseService.get(name);
+//     return "function called"
+//   }
+
+//   @UseGuards(JwtAuthGuard, RoleGuard)
+//   @Roles(Role.user)
+//   @Post()
+//   @Post()
+//   async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req:any) {
+//         let userId = (req.user.user_id);
+//         console.log(userId);
+//         //console.log(createExpenseDto);
+//        // return "working correctly";
+//         return this.expenseService.create(createExpenseDto,userId);
+//       }
+// }
