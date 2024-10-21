@@ -27,8 +27,8 @@ export class UsersController {
   ) {}
 
   @Post()
-  async create(@Body() body: {username: string, email: string, role: Role} ){
-    return this.userService.createUser(body.username, body.email, body.role)
+  async create(@Body() body: { username: string; email: string; role: Role }) {
+    return this.userService.createUser(body.username, body.email, body.role);
   }
 
   @Post('check-email')
