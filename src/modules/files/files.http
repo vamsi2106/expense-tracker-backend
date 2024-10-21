@@ -6,5 +6,5 @@ Accept: application/json
 Authorization: Bearer {{token}}
 ###
 
-DELETE {{url}}/delete/9b65ac75-226b-4293-9c2e-4ff2bf2e81bc
+DELETE {{url}}/delete/9ca664e3-f562-499a-a289-1fcd59fce728
 Authorization: Bearer {{token}}

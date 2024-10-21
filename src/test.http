@@ -7,8 +7,8 @@ POST http://localhost:5000/users
 Content-Type: application/json
 
 {
-    "username":"Vamsi",
-    "email":"nagasai.vamsi@g7cr.com",
+    "username":"Nagasritha",
+    "email":"nagasritha.er@g7cr.com",
     "userImageUrl": "https://res-console.cloudinary.com/dtyiomktp/media_explorer_thumbnails/4a409a80f067cb76779f36916711ec68/detailed",
     "role":"admin"
 }

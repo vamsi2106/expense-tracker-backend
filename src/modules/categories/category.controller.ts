@@ -29,9 +29,9 @@ import {
   
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Create a new category' })
-    @ApiResponse({ status: 201, description: 'Category created successfully.' })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 400, description: 'Bad Request.' })
+    // @ApiResponse({ status: 201, description: 'Category created successfully.' })
+    // @ApiResponse({ status: 403, description: 'Forbidden.' })
+    // @ApiResponse({ status: 400, description: 'Bad Request.' })
     @Post()
     async create(
       @Body() createCategoryDto: CreateCategoryDto,

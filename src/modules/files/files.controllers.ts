@@ -14,7 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './files.services';
 import { Express, Response } from 'express';
-import { AzureBlobStorageService } from './azure-blob-storage';
+import { AzureBlobStorageService } from './azureBlobStorage';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { RoleGuard } from '../auth/role.guard';
 import { Roles } from '../auth/role.decorator';

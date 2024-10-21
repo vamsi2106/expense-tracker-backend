@@ -5,34 +5,50 @@ import { Op } from 'sequelize';
 
 @Injectable()
 export class CategoryDao {
+
     async createCategory(categoryData: Partial<Category>, role: string): Promise<Category> {
         // Set default_category based on role
+        console.log('called');
+        console.log(categoryData);
         const existingCategory = await Category.findOne({
             where: {
                 [Op.or]: [
                     {
                         name: categoryData.name,
+                        type:categoryData.type,
                         user_id: categoryData.user_id,
                     },
                     {
                         name: categoryData.name,
+                        type:categoryData.type,
                         default_category: true,
                     },
                 ],
             },
         });
-
+        console.log(existingCategory);
+        if(role=='user'){
+            categoryData.default_category = false;
+        }else{
+            categoryData.default_category = true;
+        }
         // If a user-defined category exists, throw an exception
-        if (role === 'user' && existingCategory && !existingCategory.default_category) {
-            throw new HttpException('User-defined category already exists', HttpStatus.CONFLICT);
+        if (existingCategory) {
+            throw new HttpException('Category already exists', HttpStatus.CONFLICT);
         }
 
         // If a default category exists, throw an exception
         if (existingCategory && existingCategory.default_category) {
             throw new HttpException('A default category with this name already exists', HttpStatus.CONFLICT);
         }
-        console.log(categoryData);
-        return Category.create(categoryData);
+        console.log(categoryData, 'category data');
+        try {
+            // Existing logic here...
+            return await Category.create(categoryData);
+        } catch (error) {
+            console.error('Error creating category:', error);
+            throw new HttpException('Failed to create category', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     async deleteCategory(id: string, userId: string): Promise<void> {
@@ -83,9 +99,9 @@ export class CategoryDao {
             [Op.or]:whereClause}});
 
         // Handle case when no categories are found
-        if (categories.length === 0) {
-            throw new HttpException('No categories found', HttpStatus.NOT_FOUND);
-        }
+        // if (categories.length === 0) {
+        //     throw new HttpException('No categories found', HttpStatus.NOT_FOUND);
+        // }
 
         return categories;
     }

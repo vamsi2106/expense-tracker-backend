@@ -4,7 +4,7 @@ import { File } from 'src/database/mssql/models/file.models';
 import { FileDao } from 'src/database/mssql/dao/file.dao';
 import { FileService } from './files.services';
 import { FileController } from './files.controllers';
-import { AzureBlobStorageService } from './azure-blob-storage';
+import { AzureBlobStorageService } from './azureBlobStorage';
 import { DbModule } from 'src/database/database.module';
 import { ExpenseService } from '../expenses/expense.service';
 
