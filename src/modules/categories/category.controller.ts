@@ -14,9 +14,9 @@ import {
   } from '@nestjs/common';
   import { CategoryService } from './category.service'; // Adjust the import path as needed
   import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard'; // Adjust the import path as needed
-  import { RoleGuard } from '../auth/role.guard'; // Adjust the import path as needed
-  import { Roles } from '../auth/role.decorator'; // Adjust the import path as needed
-  import { Role } from 'src/core/enums/roles.enum'; // Adjust the import path as needed
+  // import { RoleGuard } from '../auth/role.guard'; // Adjust the import path as needed
+  // import { Roles } from '../auth/role.decorator'; // Adjust the import path as needed
+  // import { Role } from 'src/core/enums/roles.enum'; // Adjust the import path as needed
   import { CreateCategoryDto } from './DTO/createCategory.dto'; // Adjust the import path as needed
   import { UpdateCategoryDto } from './DTO/updateCategory.dto'; // Adjust the import path as needed
   import { ApiBearerAuth, ApiQuery, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -27,8 +27,7 @@ import {
   export class CategoryController {
     constructor(private readonly categoryService: CategoryService) { }
   
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles(Role.user)
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Create a new category' })
     @ApiResponse({ status: 201, description: 'Category created successfully.' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -42,36 +41,31 @@ import {
       return this.categoryService.createCategory({ ...createCategoryDto, user_id }, role);
     }
   
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles(Role.user)
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get all categories' })
     @ApiQuery({ name: 'filter', required: false, description: 'Filter categories by name.' })
     @ApiResponse({ status: 200, description: 'List of categories.' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
     @Get()
-    async findAll(@Req() req: any, @Query('filter') filter?: string) {
+    async findAll(@Req() req: any, @Query('name') name?: string) {
       const userId = req.user.user_id; // Retrieve userId from req.user
       console.log("findAll is triggered", userId, req.user);
-      return this.categoryService.getAllCategories(userId, filter);
+      return this.categoryService.getAllCategories(userId, name);
     }
-  
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles(Role.user)
-    @ApiOperation({ summary: 'Get category by name' })
-    @ApiResponse({ status: 200, description: 'Category found.' })
-    @ApiResponse({ status: 404, description: 'Category not found.' })
+    
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: 'Get all categories' })
+    @ApiQuery({ name: 'filter', required: false, description: 'Filter categories by name.' })
+    @ApiResponse({ status: 200, description: 'List of categories.' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @Get(':name')
-    async findOne(@Param('name') name: string, @Req() req: any) {
+    @Get('/users')
+    async findUserACategories(@Req() req: any, @Query('name') name?: string) {
       const userId = req.user.user_id; // Retrieve userId from req.user
-      const category = await this.categoryService.getCategoryByName(name, userId);
-      
-      // The service layer already throws HttpException if category not found
-      return category;
+      console.log("findAll is triggered", userId, req.user);
+      return this.categoryService.getAllCategories(userId, name);
     }
   
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles(Role.user)
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Update a category' })
     @ApiResponse({ status: 200, description: 'Category updated successfully.' })
     @ApiResponse({ status: 404, description: 'Category not found.' })
@@ -82,8 +76,7 @@ import {
       return this.categoryService.updateCategory(id, updateCategoryDto, userId);
     }
   
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles(Role.user)
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Delete a category' })
     @ApiResponse({ status: 200, description: 'Category deleted successfully.' })
     @ApiResponse({ status: 404, description: 'Category not found.' })

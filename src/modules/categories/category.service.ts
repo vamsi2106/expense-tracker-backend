@@ -26,17 +26,21 @@ export class CategoryService {
     await this.categoryDao.deleteCategory(id, userId);
   }
 
-  async getCategoryByName(name: string, userId: string): Promise<Category | null> {
-    const category = await this.categoryDao.getCategoryByName(name, userId);
-    if (!category) {
-      throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
-    }
-    return category;
+  // async getCategoryByName(name: string, userId: string): Promise<Category | null> {
+  //   const category = await this.categoryDao.getCategoryByName(name, userId);
+  //   if (!category) {
+  //     throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   return category;
+  // }
+
+  async getAllCategories(userId: string, name?: string): Promise<Category[]> {
+    // Call getAllCategories from DAO with filter parameters if needed
+    return await this.categoryDao.getAllCategories(userId, name);
   }
 
-  async getAllCategories(userId: string, filter?: string): Promise<Category[]> {
-    // Call getAllCategories from DAO with filter parameters if needed
-    return await this.categoryDao.getAllCategories(userId, filter);
+  async getUSerExpenses(userId:string,name?:string):Promise<Category[]>{
+    return await this.categoryDao.getUserCategories(userId,name);
   }
 
   async updateCategory(id: string, categoryData: Partial<Category>, userId: string): Promise<Category> {

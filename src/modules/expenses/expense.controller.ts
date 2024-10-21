@@ -148,8 +148,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) { }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req: any) {
     let userId = (req.user.user_id);
@@ -158,8 +157,7 @@ export class ExpenseController {
   }
 
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(
     @Req() req: any,
@@ -176,8 +174,7 @@ export class ExpenseController {
     return this.expenseService.findAll(userId, startDate, endDate, filter, transactionType, currency, limit, offset);
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req: any) {
     let userId = req.user.user_id;
@@ -193,8 +190,7 @@ export class ExpenseController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
     @Req() req: any,
@@ -218,8 +214,7 @@ export class ExpenseController {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: any) {
     let userId = req.user.user_id
@@ -241,8 +236,7 @@ export class ExpenseController {
   //   // Query methods
 
   //   // 1. Group by Date with Offset
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-date')
   async getExpensesGroupedByDate(
     @Req() req: any,
@@ -255,8 +249,7 @@ export class ExpenseController {
   }
 
   // 2. Group by Category
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-category')
   async getExpensesGroupedByCategory(
     @Req() req: any,
@@ -271,8 +264,7 @@ export class ExpenseController {
 
 
   //   // 3. Group by Week
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-week')
   async getExpensesGroupedByWeek(
     @Req() req: any,
@@ -291,8 +283,7 @@ export class ExpenseController {
   }
 
   // 4. Group by Month
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-month')
   async getExpensesGroupedByMonth(
     @Req() req:any,
@@ -319,34 +310,3 @@ export class ExpenseController {
 // }
 
 
-// import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
-// import { ExpenseService } from "./expense.service";
-// import { CreateExpenseDto } from "./dto/create-expense.dto";
-// import { JwtAuthGuard } from "../auth/jwt-auth-guard.guard";
-// import { RoleGuard } from "../auth/role.guard";
-// import { Roles } from "../auth/role.decorator";
-// import { Role } from "src/core/enums/roles.enum";
-// @Controller('/nagasritha/nagaritha')
-// export class ExpenseController{
-//   constructor(private readonly expenseService: ExpenseService){}
-
-//   @Get()
-//   async call(){
-//     console.log('triggered');
-//     let name="nagasritha"
-//     this.expenseService.get(name);
-//     return "function called"
-//   }
-
-//   @UseGuards(JwtAuthGuard, RoleGuard)
-//   @Roles(Role.user)
-//   @Post()
-//   @Post()
-//   async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req:any) {
-//         let userId = (req.user.user_id);
-//         console.log(userId);
-//         //console.log(createExpenseDto);
-//        // return "working correctly";
-//         return this.expenseService.create(createExpenseDto,userId);
-//       }
-// }

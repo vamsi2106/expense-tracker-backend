@@ -16,18 +16,18 @@ export const allCategories = [
     { name: 'Side Hustle Income', type: 'income', default_Category: false },
   ];
 
-export const CategoriesList = [
-    'Food',
-    'Transportation',
-    'Utilities',
-    'Rent',
-    'Entertainment',
-    'Health & Wellness',
-    'Salary',
-    'Investments',
-    'Freelance Income',
-    'Gifts',
-  ];
+// export const CategoriesList = [
+//     'Food',
+//     'Transportation',
+//     'Utilities',
+//     'Rent',
+//     'Entertainment',
+//     'Health & Wellness',
+//     'Salary',
+//     'Investments',
+//     'Freelance Income',
+//     'Gifts',
+//   ];
   
   
 export class CreateCategoryDto {

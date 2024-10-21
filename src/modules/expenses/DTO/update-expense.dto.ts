@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { CategoriesList } from 'src/modules/categories/DTO/createCategory.dto';
+//import { CategoriesList } from 'src/modules/categories/DTO/createCategory.dto';
 
 export class UpdateExpenseDto {
   @ApiPropertyOptional({
@@ -38,7 +38,7 @@ export class UpdateExpenseDto {
   date?: Date;
 
   @ApiPropertyOptional({
-    description: `The category of the expense (Optional). Valid options: ${CategoriesList.join(', ')}`,
+    description: `The category of the expense (Optional)}`,
     example: 'Equipment',
   })
   @IsString()

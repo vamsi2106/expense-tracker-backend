@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsDate, IsOptional, IsString, IsNumber, IsDateString, IsEnum } from 'class-validator';
 //import { IsDate } from 'sequelize-typescript';
@@ -9,6 +10,10 @@ export enum TransactionType {
 }
 
 export class CreateExpenseDto {
+  @ApiProperty({
+    description:"The amount of expense",
+    example:5000
+  })
   @IsNotEmpty()
   @IsNumber()
   amount: number;
@@ -17,6 +22,9 @@ export class CreateExpenseDto {
   @IsDate()
   @Type(() => Date)
   @IsNotEmpty()
+  @ApiProperty({
+    description:"Date "
+  })
   date: Date;
 
   @IsNotEmpty()

@@ -1,16 +1,15 @@
 @url = http://localhost:5000/tracker/expenses
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5NDg3MzM1LCJleHAiOjE3Mjk1NzM3MzV9.ZZNMEVA7G6v_4uB6WbS7qrAwOju0XZMUhtI16jl1Oao
 
 //to fetch all details
 GET {{url}}
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzM0NjE4LCJleHAiOjE3Mjk0MjEwMTh9.JP7Y3NzQqfTfSw5vl1umwCaR1gNDBpq92Tgj6ug-4TM
+Authorization: Bearer {{token}}
 ###
 
 GET {{url}}/331f5201-d4be-4c8d-a916-6da329c4c428
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzM0NjE4LCJleHAiOjE3Mjk0MjEwMTh9.JP7Y3NzQqfTfSw5vl1umwCaR1gNDBpq92Tgj6ug-4TM
-
+Authorization: Bearer {{token}}
 ###
 
 //to fetch expenses from start-date to end date
@@ -32,7 +31,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxO
     "amount": 10000,
     "date": "2024-09-13",
     "name": "Kukke , Darmasthala ",
-    "category": "Transport charges",
+    "category": "Transport charge",
     "transaction_type": "expense",
     "currency": "INR",
     "description": "it is for testing purpose"

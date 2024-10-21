@@ -23,8 +23,7 @@ import { RoleGuard } from '../auth/role.guard';
 export class ExpenseTagController {
   constructor(private readonly expenseTagService: ExpenseTagService) {}
 
-  @UseGuards(JwtAuthGuard,RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new expense tag' })
   @ApiResponse({ status: 201, description: 'Tag created successfully.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -37,9 +36,8 @@ export class ExpenseTagController {
   }
 
 
-  @UseGuards(JwtAuthGuard,RoleGuard)
-  @Roles(Role.user)
-  @ApiOperation({ summary: 'Get all tags for an expense' })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get tag for an expense' })
   @ApiResponse({ status: 200, description: 'List of expense tags.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Get(':expenseId')
@@ -49,8 +47,7 @@ export class ExpenseTagController {
     return this.expenseTagService.getTagsForExpense(expenseId, userId);
   }
 
-  @UseGuards(JwtAuthGuard,RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get all tags for an expense' })
   @ApiResponse({ status: 200, description: 'List of expense tags.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -60,8 +57,7 @@ export class ExpenseTagController {
     return this.expenseTagService.getALLTagsForExpense(userId);
   }
 
-  @UseGuards(JwtAuthGuard,RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a tag' })
   @ApiResponse({ status: 200, description: 'Tag updated successfully.' })
   @ApiResponse({ status: 404, description: 'Tag not found.' })
@@ -72,8 +68,7 @@ export class ExpenseTagController {
     return this.expenseTagService.updateExpenseTag(id, updateExpenseTagDto, userId);
   }
 
-  @UseGuards(JwtAuthGuard,RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a tag' })
   @ApiResponse({ status: 200, description: 'Tag deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Tag not found.' })

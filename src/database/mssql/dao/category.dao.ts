@@ -67,7 +67,7 @@ export class CategoryDao {
         return category;
     }
 
-    async getAllCategories(userId: string, name?: string, type?: string): Promise<Category[]> {
+    async getAllCategories(userId: string, name?: string): Promise<Category[]> {
         const whereClause: any = [
             { user_id: userId },
             {default_category : true}
@@ -75,11 +75,9 @@ export class CategoryDao {
 
         // Add filters if provided
         if (name) {
-            whereClause.name = name;
+            whereClause[0].name = name;
         }
-        if (type) {
-            whereClause.type = type; // Assuming 'type' is a valid column in the Category model
-        }
+        
 
         const categories = await Category.findAll({ where: {
             [Op.or]:whereClause}});
@@ -91,6 +89,29 @@ export class CategoryDao {
 
         return categories;
     }
+    async getUserCategories(userId: string, name?: string): Promise<Category[]> {
+        const whereClause: any = [
+            { user_id: userId },
+        ]
+
+        // Add filters if provided
+        if (name) {
+            whereClause[0].name = name;
+        }
+        
+
+        const categories = await Category.findAll({ where: {
+            [Op.or]:whereClause}});
+
+        // Handle case when no categories are found
+        if (categories.length === 0) {
+            throw new HttpException('No categories found', HttpStatus.NOT_FOUND);
+        }
+
+        return categories;
+    }
+
+
 
     async updateCategory(id: string, categoryData: Partial<Category>, userId: string): Promise<Category> {
         const category = await Category.findOne({ where: { id, user_id: userId,default_category:false } });

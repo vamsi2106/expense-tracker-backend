@@ -28,8 +28,7 @@ export class FileController {
     private readonly azureBlobService: AzureBlobStorageService, // Azure blob storage
   ) {}
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file')) // This uses Multer to handle file upload
   async uploadFile(@Param('userId') userId:string, @UploadedFile() file: Express.Multer.File) {
@@ -55,23 +54,20 @@ export class FileController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getFile(@Param('userId') userId:string, @Param('id') id: string) {
     const file = await this.fileService.getFileById(userId,id);
     return file;
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAllFiles(@Param("userId") userId:string) {
     return this.fileService.getAllFiles(userId);
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Get('download/:id')
   async downloadFile(@Param('userId') userId:string, @Param('id') id: string, @Res() res: Response) {
     const file = await this.fileService.getFileById(userId,id);
@@ -90,8 +86,7 @@ export class FileController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.user)
+  @UseGuards(JwtAuthGuard)
   @Delete('/delete/:id')
   async remove(@Param('userId') userId:string,@Param('id') id:string){
     const result = await this.fileService.remove(userId,id);
