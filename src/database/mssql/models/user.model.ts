@@ -15,7 +15,7 @@ import { Role } from 'src/core/enums/roles.enum';
 export class User extends Model<User> {
   @Column({
     type: DataType.UUID,
-    defaultValue: uuidv4(),
+    defaultValue: uuidv4,
     allowNull: false,
     primaryKey: true,
   })

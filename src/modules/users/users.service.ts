@@ -3,6 +3,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { UserDao } from '../../database/mssql/dao/user.dao';
 import { User } from '../../database/mssql/models/user.model';
 import { Role } from 'src/core/enums/roles.enum';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Injectable()
 export class UsersService {

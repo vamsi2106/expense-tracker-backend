@@ -62,7 +62,7 @@ export class ConfigServices {
   }
 
   getConnectionString() : string{
-    return this.appContainerName;
+    return this.blobConnectionString;
   }
 
   getappContainerName() : string{

@@ -43,7 +43,7 @@ import {
   
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get all categories' })
-    @ApiQuery({ name: 'filter', required: false, description: 'Filter categories by name.' })
+    @ApiQuery({ name: 'name', required: false, description: 'Filter categories by name.' })
     @ApiResponse({ status: 200, description: 'List of categories.' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
     @Get()
@@ -55,7 +55,7 @@ import {
     
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get all categories' })
-    @ApiQuery({ name: 'filter', required: false, description: 'Filter categories by name.' })
+    @ApiQuery({ name: 'name', required: false, description: 'Filter categories by name.' })
     @ApiResponse({ status: 200, description: 'List of categories.' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
     @Get('/users')
