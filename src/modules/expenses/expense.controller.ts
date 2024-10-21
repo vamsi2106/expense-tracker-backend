@@ -310,37 +310,3 @@ export class ExpenseController {
 // }
 
 
-<<<<<<< HEAD
-=======
-// import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
-// import { ExpenseService } from "./expense.service";
-// import { CreateExpenseDto } from "./dto/create-expense.dto";
-// import { JwtAuthGuard } from "../auth/jwt-auth-guard.guard";
-// import { RoleGuard } from "../auth/role.guard";
-// import { Roles } from "../auth/role.decorator";
-// import { Role } from "src/core/enums/roles.enum";
-// @Controller('/nagasritha/nagaritha')
-// export class ExpenseController{
-//   constructor(private readonly expenseService: ExpenseService){}
-
-//   @Get()
-//   async call(){
-//     console.log('triggered');
-//     let name="nagasritha"
-//     this.expenseService.get(name);
-//     return "function called"
-//   }
-
-//   @UseGuards(JwtAuthGuard, RoleGuard)
-//   @Roles(Role.user)
-//   @Post()
-//   @Post()
-//   async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req:any) {
-//         let userId = (req.user.user_id);
-//         console.log(userId);
-//         //console.log(createExpenseDto);
-//        // return "working correctly";
-//         return this.expenseService.create(createExpenseDto,userId);
-//       }
-// }
->>>>>>> ce1ddab36315875bfbdf0058ef346fb80722f919

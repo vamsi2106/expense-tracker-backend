@@ -1,7 +1,7 @@
 @url = http://localhost:5000/expenses/categories
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5NDg3MzM1LCJleHAiOjE3Mjk1NzM3MzV9.ZZNMEVA7G6v_4uB6WbS7qrAwOju0XZMUhtI16jl1Oao
 
-GET {{url}}/users?name=Transport charges
+GET {{url}}/users?name=Transport charge
 Authorization: Bearer {{token}}
 ###
 
