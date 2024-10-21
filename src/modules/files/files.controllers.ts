@@ -20,7 +20,6 @@ import { Roles } from '../auth/role.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard';
 import { Role } from 'src/core/enums/roles.enum';
 
-
 @Controller('users/:userId/files')
 export class FileController {
   constructor(
@@ -35,6 +34,12 @@ export class FileController {
       
       if (!file) {
           console.log('file is required');
+  async uploadFile(
+    @Param('userId') userId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      console.log('file is required');
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     }
 
@@ -43,8 +48,14 @@ export class FileController {
       // Upload the file to Azure Blob Storage and get the URL
       const fileUrl = await this.azureBlobService.uploadFile(file);
       console.log(fileUrl,"fileUrl");
+      console.log(fileUrl, 'fileUrl');
       // Save file details to DB
       const savedFile = await this.fileService.uploadFile(userId,file, fileUrl);
+      const savedFile = await this.fileService.uploadFile(
+        userId,
+        file,
+        fileUrl,
+      );
       return { message: 'File uploaded successfully', file: savedFile };
     } catch (error) {
       throw new HttpException(
@@ -56,14 +67,12 @@ export class FileController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getFile(@Param('userId') userId:string, @Param('id') id: string) {
-    const file = await this.fileService.getFileById(userId,id);
     return file;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllFiles(@Param("userId") userId:string) {
+  async getAllFiles(@Param('userId') userId: string) {
     return this.fileService.getAllFiles(userId);
   }
 
@@ -71,6 +80,12 @@ export class FileController {
   @Get('download/:id')
   async downloadFile(@Param('userId') userId:string, @Param('id') id: string, @Res() res: Response) {
     const file = await this.fileService.getFileById(userId,id);
+  async downloadFile(
+    @Param('userId') userId: string,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const file = await this.fileService.getFileById(userId, id);
     if (!file) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
@@ -91,11 +106,17 @@ export class FileController {
   async remove(@Param('userId') userId:string,@Param('id') id:string){
     const result = await this.fileService.remove(userId,id);
     if(!result){
+  async remove(@Param('userId') userId: string, @Param('id') id: string) {
+    const result = await this.fileService.remove(userId, id);
+    if (!result) {
       throw new HttpException(
-        {status:HttpStatus.NOT_FOUND, error : 'File does not exist to delete it'},
-        HttpStatus.NOT_FOUND
-      )
-    } 
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'File does not exist to delete it',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     return {
       status: 'success',
