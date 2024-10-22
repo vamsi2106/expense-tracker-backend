@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { RecurringTaskServices } from "./recurringExpenses.service";
 import { JwtAuthGuard } from "../auth/jwt-auth-guard.guard";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
@@ -44,6 +44,13 @@ export class RecurringExpenseController{
     async upadteTask(@Req() req:any, @Param('id') id:string, @Body() updateDetails : UpdateRecurringTaskDto){
         let userId = req.user.user_id;
         return this.recurringExpenseService.updateTask(updateDetails,id,userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('/delete/:id')
+    @ApiOperation({summary:'Delete The Recurring Task'})
+    async deleteTask(@Req() req:any, @Param('id') id:string){
+        return this.recurringExpenseService.deleteTask(id,req.user.user_id)
     }
 
 }
