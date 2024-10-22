@@ -12,6 +12,8 @@ import { CategoryModule } from '../categories/category.module';
 import { ExpenseTagModule } from '../expenseTags/expenseTag.module';
 import { TaskManager } from '../tasks/task.module';
 import { RecurringTaskModule } from '../recurringExpenses/recurringExpense.module';
+import { AzureController } from 'src/azure/azure.controller';
+import { AzureService } from 'src/azure/azure.service';
 
 @Module({
   imports: [
@@ -26,11 +28,11 @@ import { RecurringTaskModule } from '../recurringExpenses/recurringExpense.modul
     FileModule,
     CategoryModule,
     ExpenseTagModule,
-    TaskManager,
-    RecurringTaskModule
+    //TaskManager,
+    RecurringTaskModule,
   ],
-  controllers: [AppController],
-  providers: [AppService,AppLogger],
-  exports: [AppService,AppLogger],
+  controllers: [AppController, AzureController],
+  providers: [AppService, AppLogger, AzureService],
+  exports: [AppService, AppLogger],
 })
 export class AppModule {}

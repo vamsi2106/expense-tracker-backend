@@ -10,34 +10,11 @@ export class EmailService {
     );
   }
 
-  // async sendEmail(
-  //   to: string,
-  //   subject: string,
-  //   text: string,
-  //   html: string,
-  // ): Promise<void> {
-  //   const msg = {
-  //     to, // recipient
-  //     from: 'nagasai.vamsi@g7cr.com', // your verified SendGrid email
-  //     subject,
-  //     text, // plain text body
-  //     html, // HTML body
-  //   };
-
-  //   try {
-  //     await sgMail.send(msg);
-  //     console.log('Email sent successfully');
-  //   } catch (error) {
-  //     console.error('Error sending email:', error);
-  //     throw error;
-  //   }
-  // }
-
   async sendInvitationEmail(email: string, username: string) {
     const msg = {
       to: email,
       from: 'chvamsi2106@gmail.com', // Use the sender email configured in SendGrid
-      subject: 'You are Invited!',
+      subject: `You are Invited! ${username}`,
       text: `Hello ${username}, you have been invited to join our platform!`,
       html: `<strong>Hello ${username},</strong><br>You have been invited to join our platform!`,
     };
