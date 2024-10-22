@@ -4,16 +4,17 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Sequelize } from 'sequelize-typescript';
 import { CreateRecurringTaskDto } from "src/modules/recurringExpenses/DTO/createRecurringExpense.dto";
 import { UpdateRecurringTaskDto } from "src/modules/recurringExpenses/DTO/updateRecurringExpense.dto";
+import { QueryTypes } from "sequelize";
 
 @Injectable()
 export class RecurringExpenseDao {
     constructor(
         @InjectModel(RecurringTask)
         private readonly recurringTaskModel: typeof RecurringTask,
-    
+
         @Inject(Sequelize)
         private sequelize: Sequelize
-    ) {}
+    ) { }
 
     async getAllTasks(userId: string) {
         try {
@@ -25,10 +26,26 @@ export class RecurringExpenseDao {
         }
     }
 
+    async getAllActiveTasks() {
+        try {
+            let query = await this.sequelize.query(`
+                SELECT * FROM recurring_tasks r
+                LEFT JOIN expenses e ON r.expense_id = e.id
+            `, {
+                type: QueryTypes.SELECT,
+            });
+            console.log(query)
+            return query;
+        }catch(err){
+            console.log(err);
+            throw new HttpException('Internal server error'+err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     async createTask(createDto: CreateRecurringTaskDto, userId: string, expenseId) {
         try {
-            console.log({ ...createDto, user_id: userId,expense_id:expenseId});
-            const task = await this.recurringTaskModel.create({ ...createDto, user_id: userId,expense_id:expenseId });
+            console.log({ ...createDto, user_id: userId, expense_id: expenseId });
+            const task = await this.recurringTaskModel.create({ ...createDto, user_id: userId, expense_id: expenseId });
             return task; // Return the created task
         } catch (err) {
             console.error(err); // log the full error
@@ -63,6 +80,35 @@ export class RecurringExpenseDao {
             throw new HttpException('Unable to update task', HttpStatus.BAD_REQUEST);
         }
     }
+
+    async updateTaskData(updateTaskData: UpdateRecurringTaskDto, id: string) {
+        try {
+            const task = await this.recurringTaskModel.findOne({ where: { id } });
+            if (!task) {
+                throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            }
+            await task.update(updateTaskData);
+            return task; // Return the updated task
+        } catch (err) {
+            console.error(err); // log the full error
+            throw new HttpException('Unable to update task', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async updateTaskToDeactivate(id: string) {
+        try {
+            const task = await this.recurringTaskModel.findOne({ where: { id } });
+            if (!task) {
+                throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            }
+            await task.update({is_active:false});
+            return task; // Return the updated task
+        } catch (err) {
+            console.error(err); // log the full error
+            throw new HttpException('Unable to update task', HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     async getById(id: string, userId: string) {
         try {

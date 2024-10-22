@@ -5,9 +5,10 @@ import { RecurringTask } from "src/database/mssql/models/recurringExpenses.model
 import { RecurringExpenseController } from "./recurringExpenses.controller";
 import { RecurringTaskServices } from "./recurringExpenses.service";
 import { RecurringExpenseDao } from "src/database/mssql/dao/recurringExpenses.dao";
+import { Expense } from "src/database/mssql/models/expenses.models";
 
 @Module({
-    imports : [SequelizeModule.forFeature([RecurringTask]),DbModule],
+    imports : [SequelizeModule.forFeature([Expense, RecurringTask]),DbModule],
     controllers : [RecurringExpenseController],
     providers : [RecurringTaskServices, RecurringExpenseDao]
 })

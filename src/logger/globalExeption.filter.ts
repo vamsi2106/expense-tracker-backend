@@ -1,4 +1,12 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { 
+  ExceptionFilter, 
+  Catch, 
+  ArgumentsHost, 
+  HttpException, 
+  HttpStatus, 
+  BadRequestException, 
+  UnauthorizedException 
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppLogger } from './app-logger';
 
@@ -84,5 +92,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Send the error response to the client
     response.status(status).json(message);
+  }
+
+  // New method to handle success responses
+  handleSuccess(response: Response, data: any, message: string = 'Success') {
+    const successResponse = {
+      statusCode: HttpStatus.OK,
+      timestamp: new Date().toISOString(),
+      path: response.req.originalUrl,
+      method: response.req.method,
+      message: message,
+      data: data,
+    };
+
+    response.status(HttpStatus.OK).json(successResponse);
   }
 }

@@ -77,4 +77,17 @@ export class AzureBlobStorageService {
 
     stream.pipe(res);
   }
+
+  async deleteFile(fileName: string): Promise<void> {
+    const containerClient = this.blobServiceClient.getContainerClient(this.appContainerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+
+    // Delete the blob
+    const deleteBlobResponse = await blockBlobClient.deleteIfExists(); // Returns a boolean indicating if the blob was deleted
+    // if (!deleteBlobResponse) {
+    //   throw new Error(`File ${fileName} could not be deleted, it may not exist.`);
+    // }
+
+    console.log(`File ${fileName} deleted successfully`);
+  }
 }

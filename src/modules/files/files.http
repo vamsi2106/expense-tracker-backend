@@ -1,10 +1,9 @@
-@url = http://localhost:5000/users/0b21908b-b55f-47b5-b33f-c7f4ebe61b53/files
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5NDg3MzM1LCJleHAiOjE3Mjk1NzM3MzV9.ZZNMEVA7G6v_4uB6WbS7qrAwOju0XZMUhtI16jl1Oao
-
+@url = http://localhost:5000/users/506a0bc1-5ce9-40ec-a30c-cf0659e0c52f/files
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDZhMGJjMS01Y2U5LTQwZWMtYTMwYy1jZjA2NTllMGM1MmYiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjoiIiwiZW1haWwiOiJuYWdhc2FpLnZhbXNpQGc3Y3IuY29tIiwicm9sZSI6InVzZXIiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJpYXQiOjE3Mjk1NjU5ODIsImV4cCI6MTcyOTY1MjM4Mn0.CZ0mH1gUrGeLob-tGl2FdiqO3k5pXcrJtEAeUQ9lJzs
 GET {{url}}
 Accept: application/json
 Authorization: Bearer {{token}}
 ###
 
-DELETE {{url}}/delete/9ca664e3-f562-499a-a289-1fcd59fce728
+DELETE {{url}}/delete/655c1673-185f-462d-a78b-9ec385ece264
 Authorization: Bearer {{token}}

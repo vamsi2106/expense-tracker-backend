@@ -1,72 +1,96 @@
-import { IsString, IsDate, IsOptional, IsUUID, IsBoolean } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { 
+  IsNotEmpty, 
+  IsOptional, 
+  IsString, 
+  IsEnum, 
+  IsBoolean, 
+  IsDate 
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotPastDate } from 'src/utility/dateValidation'; // Import your custom validator
+import { Type } from 'class-transformer';
+
+export enum RecurringInterval {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+  HOURLY = 'hour',
+  MINUTE = 'minute',
+}
 
 export class UpdateRecurringTaskDto {
-  @ApiPropertyOptional({
-    description: 'Unique identifier for the task (Optional)',
+
+  @ApiProperty({
+    description: 'Name of the task',
     type: String,
-    format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: 'Daily Standup Meeting',
   })
-  @IsUUID()
   @IsOptional()
-  id?: string; // Unique identifier for the task
+  @IsString({ message: 'Name must be a string.' })
+  name?: string;
 
-  @ApiPropertyOptional({
-    description: 'Name of the task (Optional)',
-    example: 'Weekly Team Meeting',
-  })
-  @IsString()
-  @IsOptional()
-  name?: string; // Name of the task
-
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Optional description of the task',
-    example: 'Discuss project updates and blockers',
+    type: String,
+    example: 'A daily meeting to discuss project updates',
+    required: false,
   })
-  @IsString()
   @IsOptional()
-  description?: string; // Optional description of the task
+  @IsString({ message: 'Description must be a string.' })
+  description?: string;
 
-  @ApiPropertyOptional({
-    description: 'The date when the recurring task should start (Optional)',
-    example: '2023-10-18T00:00:00.000Z',
+  @ApiProperty({
+    description: 'The date when the recurring task should start in "YYYY-MM-DD" format',
+    type: String,
+    format: 'date',
+    example: '2024-02-20',
   })
-  @IsDate()
   @IsOptional()
-  start_date?: Date; // The date when the recurring task should start
+  @IsDate({ message: 'Start date must be a valid date.' })
+  @Type(() => Date)  // Automatically converts the incoming string to a Date object
+  @IsNotPastDate({ message: 'Start date should not be in the past.' })  // Custom validator to check future dates
+  start_date?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Optional end date for the task',
-    example: '2024-10-18T00:00:00.000Z',
+  @ApiProperty({
+    description: 'Optional end date for the task in "YYYY-MM-DD" format',
+    type: String,
+    format: 'date',
+    example: '2024-12-31',
+    required: false,
   })
-  @IsDate()
   @IsOptional()
-  end_date?: Date; // Optional end date for the task
+  @IsDate({ message: 'End date must be a valid date.' })
+  @Type(() => Date)  // Converts the incoming string to a Date object
+  @IsNotPastDate({ message: 'End date should not be in the past.' })  // Custom validator to check future dates
+  end_date?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Interval type (e.g., "Daily", "Weekly", "Monthly", or cron expression) (Optional)',
-    example: 'Weekly',
+  @ApiProperty({
+    description: 'Interval type (e.g., "Daily", "Weekly", "Monthly")',
+    type: String,
+    enum: RecurringInterval,
+    example: 'Daily',
   })
-  @IsString()
   @IsOptional()
-  interval?: string; // Interval type
+  @IsEnum(RecurringInterval, { message: `Interval must be one of: ${Object.values(RecurringInterval).join(', ')}` })
+  interval?: RecurringInterval;
 
-  @ApiPropertyOptional({
-    description: 'Specific time of day for execution (HH:MM:SS) (Optional)',
-    example: '10:00:00',
+  @ApiProperty({
+    description: 'Specific time of day for execution (HH:MM:SS)',
+    type: String,
+    example: '09:00:00',
   })
-  @IsString()
   @IsOptional()
-  time?: string; // Specific time of day for execution
+  @IsString({ message: 'Time must be a string in HH:MM:SS format.' })
+  time?: string;
 
-  @ApiPropertyOptional({
-    description: 'Whether the task is active or not (Optional)',
-    example: true,
+  @ApiProperty({
+    description: 'Whether the task is active or not',
+    type: Boolean,
     default: true,
+    required: false,
   })
-  @IsBoolean()
   @IsOptional()
-  is_active?: boolean; // Whether the task is active or not
-
+  @IsBoolean({ message: 'is_active must be a boolean.' })
+  is_active?: boolean;
 }

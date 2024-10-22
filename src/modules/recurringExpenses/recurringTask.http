@@ -10,11 +10,26 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": 12,
+  "name": "Hospetal charges",
   "description": "It is a family trip",
   "start_date": "2024-12-20",
-  "interval": "Weekly",
+  "interval": "weekly",
   "time": "12:00:00"
 }
+###
+PUT {{url}}/update/ab74f040-ebcd-407c-8489-82829cbdb1c2
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
+{
+  "name": "Holiday",
+  "description": "It is a family trip",
+  "start_date": "2024-12-20",
+  "interval": "weekly",
+  "time": "12:00:00"
+}
+###
+
+DELETE {{url}}/delete/ab74f040-ebcd-407c-8489-82829cbdb1c2
+Authorization: Bearer {{token}}
 

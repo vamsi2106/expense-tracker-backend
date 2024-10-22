@@ -173,6 +173,12 @@ export class FileController {
   @UseGuards(JwtAuthGuard)
   @Delete('/delete/:id')
   async remove(@Param('userId') userId: string, @Param('id') id: string) {
+    let fileData = await this.fileService.getFileById(userId,id);
+    if(fileData){
+          let response = this.azureBlobService.deleteFile(fileData.originalFileName);
+          console.log(response);
+        }
+
     const result = await this.fileService.remove(userId, id);
     if (!result) {
       throw new HttpException(

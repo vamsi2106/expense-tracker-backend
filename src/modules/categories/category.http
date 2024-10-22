@@ -10,7 +10,7 @@ Authorization: Bearer {{user_token}}
 content-type:application/json
 
 {
-    "name" : "Transport charge",
+    "name" : "Hospetal charges",
     "type" : "expense"
 }
 ###
