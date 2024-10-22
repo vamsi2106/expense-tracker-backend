@@ -1,36 +1,96 @@
-import { IsNotEmpty, IsString, IsDate, IsOptional } from 'class-validator';
+import { 
+  IsNotEmpty, 
+  IsOptional, 
+  IsString, 
+  IsEnum, 
+  IsBoolean, 
+  IsDate 
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotPastDate } from 'src/utility/dateValidation'; // Import your custom validator
+import { Type } from 'class-transformer';
 
-export class CreateRecurringExpenseDto {
-  @ApiProperty({
-    description: 'ID of the original expense being repeated',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsString()
-  @IsNotEmpty()
-  expense_id: string;
+export enum RecurringInterval {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+  HOURLY = 'hour',
+  MINUTE = 'minute',
+}
 
-  @ApiProperty({
-    description: 'Frequency of the recurring expense (e.g., daily, weekly, monthly)',
-    example: 'monthly',
-  })
-  @IsString()
-  @IsNotEmpty()
-  frequency: string;
+export class CreateRecurringTaskDto {
 
   @ApiProperty({
-    description: 'Start date of the recurring expense',
-    example: '2023-10-18T00:00:00.000Z',
+    description: 'Name of the task',
+    type: String,
+    example: 'Daily Standup Meeting',
   })
-  @IsDate()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Name is required.' })
+  @IsString({ message: 'Name must be a string.' })
+  name: string;
+
+  @ApiProperty({
+    description: 'Optional description of the task',
+    type: String,
+    example: 'A daily meeting to discuss project updates',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Description must be a string.' })
+  description?: string;
+
+  @ApiProperty({
+    description: 'The date when the recurring task should start in "YYYY-MM-DD" format',
+    type: String,
+    format: 'date',
+    example: '2024-02-20',
+  })
+  @IsNotEmpty({ message: 'Start date is required.' })
+  @IsDate({ message: 'Start date must be a valid date.' })
+  @Type(() => Date)  // Automatically converts the incoming string to a Date object
+  @IsNotPastDate({ message: 'Start date should not be in the past.' })  // Custom validator to check future dates
   start_date: Date;
 
   @ApiProperty({
-    description: 'End date of the recurring expense (optional)',
-    example: '2024-10-18T00:00:00.000Z',
+    description: 'Optional end date for the task in "YYYY-MM-DD" format',
+    type: String,
+    format: 'date',
+    example: '2024-12-31',
+    required: false,
   })
-  @IsDate()
   @IsOptional()
+  @IsDate({ message: 'End date must be a valid date.' })
+  @Type(() => Date)  // Converts the incoming string to a Date object
+  @IsNotPastDate({ message: 'End date should not be in the past.' })  // Custom validator to check future dates
   end_date?: Date;
+
+  @ApiProperty({
+    description: 'Interval type (e.g., "Daily", "Weekly", "Monthly")',
+    type: String,
+    enum: RecurringInterval,
+    example: 'Daily',
+  })
+  @IsNotEmpty({ message: 'Interval is required.' })
+  @IsEnum(RecurringInterval, { message: `Interval must be one of: ${Object.values(RecurringInterval).join(', ')}` })
+  interval: RecurringInterval;
+
+  @ApiProperty({
+    description: 'Specific time of day for execution (HH:MM:SS)',
+    type: String,
+    example: '09:00:00',
+  })
+  @IsNotEmpty({ message: 'Time is required.' })
+  @IsString({ message: 'Time must be a string in HH:MM:SS format.' })
+  time: string;
+
+  @ApiProperty({
+    description: 'Whether the task is active or not',
+    type: Boolean,
+    default: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'is_active must be a boolean.' })
+  is_active?: boolean;
 }

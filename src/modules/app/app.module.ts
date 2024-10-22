@@ -10,6 +10,8 @@ import { FileModule } from '../files/files.modules';
 import { AppLogger } from 'src/logger/app-logger';
 import { CategoryModule } from '../categories/category.module';
 import { ExpenseTagModule } from '../expenseTags/expenseTag.module';
+import { TaskManager } from '../tasks/task.module';
+import { RecurringTaskModule } from '../recurringExpenses/recurringExpense.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { ExpenseTagModule } from '../expenseTags/expenseTag.module';
     ExpenseModule,
     FileModule,
     CategoryModule,
-    ExpenseTagModule
+    ExpenseTagModule,
+    TaskManager,
+    RecurringTaskModule
   ],
   controllers: [AppController],
   providers: [AppService,AppLogger],

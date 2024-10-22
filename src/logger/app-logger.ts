@@ -15,7 +15,7 @@ export class AppLogger extends Logger {
   }
 
   // Log errors with status code and metadata
-  logError(message: string, statusCode: number, metadata?: any) {
+  logError(message: any, statusCode: number, metadata?: any) {
     const logMessage = `[${new Date().toISOString()}] ERROR: ${message} (Status: ${statusCode})`;
     if (metadata) {
       this.writeLogToFile(`${logMessage} - Metadata: ${JSON.stringify(metadata)}`);

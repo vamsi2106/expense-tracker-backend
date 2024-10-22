@@ -1,0 +1,20 @@
+@url = http://localhost:5000/recurring/task
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDZhMGJjMS01Y2U5LTQwZWMtYTMwYy1jZjA2NTllMGM1MmYiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjoiIiwiZW1haWwiOiJuYWdhc2FpLnZhbXNpQGc3Y3IuY29tIiwicm9sZSI6InVzZXIiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJpYXQiOjE3Mjk1NjU5ODIsImV4cCI6MTcyOTY1MjM4Mn0.CZ0mH1gUrGeLob-tGl2FdiqO3k5pXcrJtEAeUQ9lJzs
+
+GET {{url}}
+Authorization: Bearer {{token}}
+###
+
+POST {{url}}/add/099c6bc6-6224-443b-a314-86f69f217c7f
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": 12,
+  "description": "It is a family trip",
+  "start_date": "2024-12-20",
+  "interval": "Weekly",
+  "time": "12:00:00"
+}
+
+

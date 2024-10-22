@@ -8,8 +8,8 @@ import { Category } from '../models/category.models';
 import { Expense } from '../models/expenses.models';
 import { ExpenseTag } from '../models/expenseTags.models';
 import { File } from '../models/file.models';
-import { RecurringExpense } from '../models/recurringExpenses.models';
+import { RecurringTask } from '../models/recurringExpenses.models';
 import { User } from '../models/user.model';
 
-export const SchemasList = [Expense,User,File,Category,ExpenseTag,RecurringExpense];
+export const SchemasList = [Expense,User,File,Category,ExpenseTag,RecurringTask];
 export const DaoList = [UserDao,ExpenseDao,FileDao,CategoryDao,ExpenseTagDao] 

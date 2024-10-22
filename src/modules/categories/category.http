@@ -10,8 +10,8 @@ Authorization: Bearer {{user_token}}
 content-type:application/json
 
 {
-    "name" : "example",
-    "type" : "income"
+    "name" : "Transport charge",
+    "type" : "expense"
 }
 ###
 

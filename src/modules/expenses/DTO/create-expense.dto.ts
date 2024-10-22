@@ -13,7 +13,7 @@ export class CreateExpenseDto {
     description: "The amount of the expense or income transaction",
     example: 5000,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({message:"amount must be included in the body"})
   @IsNumber()
   amount: number;
 
