@@ -12,6 +12,8 @@ import { CategoryModule } from '../categories/category.module';
 import { ExpenseTagModule } from '../expenseTags/expenseTag.module';
 import { TaskManager } from '../tasks/task.module';
 import { RecurringTaskModule } from '../recurringExpenses/recurringExpense.module';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter'; // Path to your exception filter
 
 @Module({
   imports: [
@@ -26,11 +28,14 @@ import { RecurringTaskModule } from '../recurringExpenses/recurringExpense.modul
     FileModule,
     CategoryModule,
     ExpenseTagModule,
-    TaskManager,
+   // TaskManager,
     RecurringTaskModule
   ],
   controllers: [AppController],
-  providers: [AppService,AppLogger],
+  providers: [AppService,AppLogger,{
+    provide: APP_FILTER,
+    useClass: GlobalExceptionFilter,
+  }],
   exports: [AppService,AppLogger],
 })
 export class AppModule {}

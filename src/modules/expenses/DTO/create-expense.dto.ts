@@ -23,23 +23,23 @@ export class CreateExpenseDto {
   })
   @IsDate()
   @Type(() => Date)
-  @IsNotEmpty()
+  @IsNotEmpty({message:"date is required"})
   date: Date;
 
   @ApiProperty({
     description: "The name of the expense or income source",
     example: "Office rent",
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({message:"name is required"})
+  @IsString({message:"name should be of type string"})
   name: string;
 
   @ApiProperty({
     description: "The category of the expense or income",
     example: "Utilities",
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({message:"category is required"})
+  @IsString({message:"category should be of type string"})
   category: string;
 
   @ApiProperty({
@@ -47,7 +47,7 @@ export class CreateExpenseDto {
     example: TransactionType.EXPENSE,
     enum: TransactionType,  // Displays the enum values in Swagger
   })
-  @IsNotEmpty()
+  @IsNotEmpty({message:"transaction type is required"})
   @IsEnum(TransactionType)
   transaction_type: TransactionType;
 
@@ -55,8 +55,8 @@ export class CreateExpenseDto {
     description: "The currency used for the transaction",
     example: "USD",
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({message:"currency is required"})
+  @IsString({message:"surrency should be of type string"})
   currency: string;
 
   @ApiPropertyOptional({
@@ -72,6 +72,6 @@ export class CreateExpenseDto {
     example: "Payment for office rent",
   })
   @IsOptional()
-  @IsString()
+  @IsString({message:"description should be of type string"})
   description?: string;
 }

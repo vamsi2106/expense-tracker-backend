@@ -62,7 +62,7 @@ import {
     async findUserACategories(@Req() req: any, @Query('name') name?: string) {
       const userId = req.user.user_id; // Retrieve userId from req.user
       console.log("findAll is triggered", userId, req.user);
-      return this.categoryService.getAllCategories(userId, name);
+      return await this.categoryService.getAllCategories(userId, name);
     }
   
     @UseGuards(JwtAuthGuard)
@@ -73,7 +73,7 @@ import {
     @Put(':id')
     async update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto, @Req() req: any) {
       const userId = req.user.user_id; // Retrieve userId from req.user
-      return this.categoryService.updateCategory(id, updateCategoryDto, userId);
+      return await this.categoryService.updateCategory(id, updateCategoryDto, userId);
     }
   
     @UseGuards(JwtAuthGuard)
@@ -84,8 +84,7 @@ import {
     @Delete(':id')
     async remove(@Param('id') id: string, @Req() req: any) {
       const userId = req.user.user_id; // Retrieve userId from req.user
-      await this.categoryService.deleteCategory(id, userId);
-      return { message: 'Category deleted successfully' };
+      return await this.categoryService.deleteCategory(id, userId);
     }
   }
   

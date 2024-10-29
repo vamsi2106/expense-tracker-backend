@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User } from './user.model';
 import { Expense } from './expenses.models';
 
@@ -26,6 +26,9 @@ export class ExpenseTag extends Model {
     onUpdate: 'CASCADE',  // Cascade update when User is updated
   })
   expense_id: string;
+
+  @BelongsTo(()=>Expense, {foreignKey:'expense_id'})
+  expense:Expense
 
   @Column({ type: DataType.STRING, allowNull: false })
   tag_name: string;

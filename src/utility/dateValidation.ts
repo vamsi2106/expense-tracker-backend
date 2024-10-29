@@ -9,14 +9,30 @@ export function IsNotPastDate(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any, args: ValidationArguments) {
-          if (!value) return true; // Skip validation if no value (to allow optional dates)
+          if (!value) return true;
+          
           const inputDate = new Date(value);
+          if (isNaN(inputDate.getTime())) return false; // Invalid date
+          
           const today = new Date();
-          today.setHours(0, 0, 0, 0); // Set time to the start of the current day
-          return inputDate >= today; // Check if date is not in the past
+          
+          // Compare only dates, not times
+          const inputDateOnly = new Date(
+            inputDate.getFullYear(),
+            inputDate.getMonth(),
+            inputDate.getDate()
+          );
+          
+          const todayOnly = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+          );
+          
+          return inputDateOnly >= todayOnly;
         },
-        defaultMessage(): string {
-          return `${propertyName} should not be in the past.`;
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must not be in the past`;
         },
       },
     });

@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey, HasMany } from 'sequelize-typescript';
 import { User } from './user.model';
 import { Expense } from './expenses.models';
 
@@ -18,7 +18,7 @@ export class Category extends Model {
   }) // Nullable for default categories
   user_id: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
   name: string;
 
   @Column({
@@ -30,7 +30,6 @@ export class Category extends Model {
   @Column({ type: DataType.BOOLEAN, defaultValue: false, allowNull: false })
   default_category: boolean; // True for admin-defined, False for user-defined
 
-  static associate() {
-    Category.hasMany(Expense, { foreignKey: 'category_id' });
-  }
+  @HasMany(() => Expense, { foreignKey: "category_id" })
+  expense: Expense[];
 }

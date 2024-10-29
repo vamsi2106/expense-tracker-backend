@@ -1,14 +1,115 @@
-import { 
-  ExceptionFilter, 
-  Catch, 
-  ArgumentsHost, 
-  HttpException, 
-  HttpStatus, 
-  BadRequestException, 
-  UnauthorizedException 
+// import { 
+//   ExceptionFilter, 
+//   Catch, 
+//   ArgumentsHost, 
+//   HttpException, 
+//   HttpStatus, 
+//   BadRequestException, 
+//   UnauthorizedException 
+// } from '@nestjs/common';
+// import { Request, Response } from 'express';
+// import { AppLogger } from './app-logger';
+//import { ResponseMessages } from 'src/common/messages';
+
+// import {
+//   ExceptionFilter,
+//   Catch,
+//   ArgumentsHost,
+//   HttpException,
+//   HttpStatus,
+//   BadRequestException,
+//   UnauthorizedException,
+// } from '@nestjs/common';
+// import { Request, Response } from 'express';
+// import { AppLogger } from './app-logger';
+// import { ResponseMessages } from 'src/common/messages';
+
+// @Catch()
+// export class GlobalExceptionFilter implements ExceptionFilter {
+//   constructor(private readonly appLogger: AppLogger) {}
+
+//   catch(exception: unknown, host: ArgumentsHost) {
+//     const ctx = host.switchToHttp();
+//     const response = ctx.getResponse<Response>();
+//     const request = ctx.getRequest<Request>();
+
+//     // Default to internal server error if the exception is not an HttpException
+//     let status =
+//       exception instanceof HttpException
+//         ? exception.getStatus()
+//         : HttpStatus.INTERNAL_SERVER_ERROR;
+
+//     let errorResponse: any =
+//       exception instanceof HttpException
+//         ? exception.getResponse()
+//         : 'Internal server error';
+
+//     // Handle error response as string or object
+//     if (typeof errorResponse === 'string') {
+//       errorResponse = { message: errorResponse }; // Wrap string in an object
+//     }
+
+//     // Ensure the final error response structure
+//     const errorMessage = {
+//       statusCode: status,
+//       timestamp: new Date().toISOString(),
+//       path: request.url,
+//       method: request.method,
+//       // Ensure 'message' comes from the response and not 'response'
+//       message: errorResponse.message || errorResponse.response || 'An error occurred.',
+//     };
+
+//     if (exception instanceof BadRequestException) {
+//       const validationErrors = (errorResponse as any).message;
+//       errorMessage.message = Array.isArray(validationErrors)
+//         ? validationErrors.join(' ')
+//         : validationErrors;
+//     }
+
+//     if (exception instanceof UnauthorizedException) {
+//       errorMessage.message = ResponseMessages.UA;
+//     }
+
+//     // Log the error using the custom logger
+//     this.appLogger.logError(errorMessage, status, {
+//       path: request.url,
+//       method: request.method,
+//       body: request.body,
+//     });
+
+//     // Return the cleaned-up error message
+//     response.status(status).json(errorMessage);
+//     console.log(errorMessage,status);
+//   }
+
+//   async handleSuccess(response: Response, data: any, message: string = 'Success') {
+//     const successResponse = {
+//       statusCode: HttpStatus.OK,
+//       timestamp: new Date().toISOString(),
+//       path: response.req.originalUrl,
+//       method: response.req.method,
+//       message: message,
+//       data: data,
+//     };
+
+//     response.status(HttpStatus.OK).json(successResponse);
+//   }
+// }
+
+//claud ai code
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+  UnauthorizedException,
+  ValidationError,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppLogger } from './app-logger';
+import { ResponseMessages } from 'src/common/messages';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -19,83 +120,161 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let errorMessage: any = {
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      method: request.method,
+      message: 'Internal server error',
+      error: null
+    };
 
-    let message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal server error';
+    try {
+      // Handle different types of exceptions
+      if (exception instanceof HttpException) {
+        status = exception.getStatus();
+        const errorResponse = exception.getResponse();
 
-    // Handle specific exception cases
-    if (exception instanceof BadRequestException) {
-      const validationErrors = exception.getResponse() as any;
-      status = HttpStatus.BAD_REQUEST;
-
-      // Format the error messages
-      const errorMessages: string[] = [];
-
-      Object.keys(validationErrors.message).forEach(key => {
-        const messages = validationErrors.message[key];
-        if (Array.isArray(messages)) {
-          errorMessages.push(...messages);
-        } else {
-          errorMessages.push(messages);
+        if (typeof errorResponse === 'string') {
+          errorMessage.message = errorResponse;
+        } else if (typeof errorResponse === 'object') {
+          const errorObj = errorResponse as any;
+          errorMessage.message = errorObj.message || errorObj.error || 'An error occurred';
+          errorMessage.error = errorObj.error || null;
+          
+          // Handle validation errors specifically
+          if (Array.isArray(errorObj.message)) {
+            errorMessage.message = this.formatValidationErrors(errorObj.message);
+            errorMessage.error = 'Validation Error';
+          }
         }
-      });
+      } else if (this.isDatabaseError(exception)) {
+        // Handle database errors
+        status = HttpStatus.BAD_REQUEST;
+        errorMessage.message = 'Database operation failed';
+        errorMessage.error = 'Database Error';
+        
+        // Log the actual error for debugging but don't send to client
+        this.appLogger.logError({
+          ...errorMessage,
+          detail: (exception as any).detail,
+          code: (exception as any).code
+        }, status, {
+          path: request.url,
+          method: request.method,
+          body: request.body,
+        });
+      } else if (exception instanceof Error) {
+        // Handle standard JavaScript errors
+        errorMessage.message = exception.message;
+        errorMessage.error = exception.name;
+      }
 
-      message = {
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        method: request.method,
-        message: errorMessages.join(' '), // Join messages into a single string
-      };
-    } else if (exception instanceof UnauthorizedException) {
-      // Handle UnauthorizedException specifically
-      status = HttpStatus.UNAUTHORIZED;
-      message = {
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        method: request.method,
-        message: 'Unauthorized access. Please provide valid credentials.',
-      };
-    } else if (exception instanceof HttpException) {
-      // Handle other HttpException scenarios
-      message = {
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        method: request.method,
-        message: message ?? 'An error occurred.',
-      };
-    } else {
-      // Handle any other errors that are not HttpExceptions
-      message = {
+      // Update status code in error message
+      errorMessage.statusCode = status;
+
+      // Special case handling
+      if (exception instanceof BadRequestException) {
+        const validationErrors = (exception.getResponse() as any).message;
+        errorMessage.message = Array.isArray(validationErrors)
+          ? this.formatValidationErrors(validationErrors)
+          : validationErrors;
+        errorMessage.error = 'Validation Error';
+      }
+
+      if (exception instanceof UnauthorizedException) {
+        errorMessage.message = ResponseMessages.UA;
+        errorMessage.error = 'Unauthorized';
+      }
+
+      // Remove sensitive information from error response
+      this.sanitizeErrorResponse(errorMessage);
+
+      // Log the error
+      this.appLogger.logError(
+        {
+          ...errorMessage,
+          originalError: exception instanceof Error ? exception.stack : null
+        },
+        status,
+        {
+          path: request.url,
+          method: request.method,
+          body: this.sanitizeRequestBody(request.body),
+        }
+      );
+
+    } catch (error) {
+      // If error handling itself fails, return a generic error
+      console.error('Error in exception filter:', error);
+      errorMessage = {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         timestamp: new Date().toISOString(),
-        path: request.url,
-        method: request.method,
-        message: 'Internal server error',
+        message: 'An unexpected error occurred',
+        error: 'Internal Server Error'
       };
     }
 
-    // Log the error using the AppLogger
-    this.appLogger.logError(message, status, {
-      path: request.url,
-      method: request.method,
-      body: request.body,
-    });
-
-    // Send the error response to the client
-    response.status(status).json(message);
+    // Send response
+    response.status(status).json(errorMessage);
   }
 
-  // New method to handle success responses
-  handleSuccess(response: Response, data: any, message: string = 'Success') {
+  private isDatabaseError(error: any): boolean {
+    return (
+      error?.name === 'QueryFailedError' ||
+      error?.code?.startsWith('23') || // PostgreSQL error codes
+      error?.errno === 1062 || // MySQL duplicate entry
+      (error?.message && error?.message.includes('duplicate key'))
+    );
+  }
+
+  private formatValidationErrors(errors: any[]): string {
+    if (!Array.isArray(errors)) {
+      return 'Validation failed';
+    }
+
+    return errors
+      .map(error => {
+        if (typeof error === 'string') {
+          return error;
+        }
+        if (error.constraints) {
+          return Object.values(error.constraints);
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .flat()
+      .join('. ');
+  }
+
+  private sanitizeErrorResponse(errorResponse: any): void {
+    // Remove sensitive fields
+    const sensitiveFields = ['password', 'token', 'secret', 'key'];
+    for (const field of sensitiveFields) {
+      if (errorResponse[field]) {
+        delete errorResponse[field];
+      }
+    }
+  }
+
+  private sanitizeRequestBody(body: any): any {
+    if (!body) return body;
+    
+    const sanitizedBody = { ...body };
+    const sensitiveFields = ['password', 'token', 'secret', 'key'];
+    
+    for (const field of sensitiveFields) {
+      if (sanitizedBody[field]) {
+        sanitizedBody[field] = '[REDACTED]';
+      }
+    }
+    
+    return sanitizedBody;
+  }
+
+  async handleSuccess(response: Response, data: any, message: string = 'Success') {
     const successResponse = {
       statusCode: HttpStatus.OK,
       timestamp: new Date().toISOString(),

@@ -43,11 +43,12 @@ export class ExpenseController {
     @Query('transactionType') transactionType?: string,
     @Query('currency') currency?: string,
     @Query('limit') limit?: number,
-    @Query('offset') offset?: number
+    @Query('offset') offset?: number,
   ) {
     let userId = req.user.user_id;
     console.log(userId);
     return this.expenseService.findAll(userId, startDate, endDate, filter, transactionType, currency, limit, offset);
+
   }
 
   @UseGuards(JwtAuthGuard)
@@ -83,19 +84,7 @@ export class ExpenseController {
   ) {
     let userId = req.user.user_id;
     const updatedExpense = await this.expenseService.update(userId, id, updateExpenseDto);
-
-    if (!updatedExpense) {
-      throw new HttpException(
-        { status: HttpStatus.NOT_FOUND, error: 'Expense not found or update failed' },
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    return {
-      status: 'success',
-      message: 'Expense updated successfully',
-      data: updatedExpense,
-    };
+    return updatedExpense;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -167,9 +156,11 @@ export class ExpenseController {
   ) {
     let userId = req.user.user_id;
     const currentDate = new Date();
-    const defaultMonth = month ?? currentDate.getMonth() + 1;
-    const defaultYear = year ?? currentDate.getFullYear();
+    const defaultMonth = isNaN(month) ? currentDate.getMonth() + 1 : month;
+    const defaultYear = isNaN(year) ? currentDate.getFullYear() : year;
     const defaultFileId = file_id ?? null;
+    console.log(year);
+    console.log(userId, defaultMonth, defaultYear, defaultFileId, "parameters from controllers")
 
     return await this.expenseService.getExpensesGroupedByWeek(userId, defaultMonth, defaultYear, defaultFileId);
   }
@@ -189,6 +180,6 @@ export class ExpenseController {
     const defaultYear = year ? (year) : (currentDate.getFullYear());
     const defaultFileId = file_id ?? null;
 
-    return await this.expenseService.getExpensesGroupedByMonth(userId,defaultFileId, defaultYear);
+    return await this.expenseService.getExpensesGroupedByMonth(userId, defaultFileId, defaultYear);
   }
 }

@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User } from './user.model';
 import { Expense } from './expenses.models';
 
@@ -20,8 +20,7 @@ export class RecurringTask extends Model {
 
   @Column({
     type: DataType.STRING(255),
-    allowNull: false,
-    unique:true
+    allowNull: false
   })
   name: string; // Name of the task
 
@@ -82,4 +81,7 @@ export class RecurringTask extends Model {
     onUpdate: 'CASCADE', 
   })
   expense_id:string;
+
+  @BelongsTo(()=>Expense, {foreignKey:'expense_id'})
+  expense:Expense
 }

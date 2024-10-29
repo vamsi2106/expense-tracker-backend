@@ -1,21 +1,20 @@
 @url = http://localhost:5000/expenses/tags
-@user_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDZhMGJjMS01Y2U5LTQwZWMtYTMwYy1jZjA2NTllMGM1MmYiLCJ1c2VybmFtZSI6IlZhbXNpIiwidXNlckltYWdlVXJsIjoiIiwiZW1haWwiOiJuYWdhc2FpLnZhbXNpQGc3Y3IuY29tIiwicm9sZSI6InVzZXIiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIxVDEzOjQ2OjI3LjM3MloiLCJpYXQiOjE3Mjk1MTg0MDcsImV4cCI6MTcyOTYwNDgwN30.X8YIzPz8FY_3S53L_21TvE-dRBwYCLjbGbN1u_Eas40
-
+@user_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZTRmYjNmMC0zMDFiLTQ4YTQtOGU2NS1jMTE2MGU4MmFlYTciLCJ1c2VybmFtZSI6ImphaG5hdmkiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJwZW5uYWJhZGkuamFobmF2aUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyNTowNC4zMDVaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyNTowNC4zMDVaIiwiaWF0IjoxNzI5ODU5Mjg0LCJleHAiOjE3MzAxMTg0ODR9.KmeQCqhCpfIeRtl9JCxPdtPaQusrOsiuHm4pbvd6TXg
 
 GET {{url}}
 Authorization: Bearer {{user_token}}
 ###
 
-POST {{url}}/099c6bc6-6224-443b-a314-86f69f217c7f
+POST {{url}}/3353b48e-ee37-4c70-8469-25d856c7fab0
 Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
-    "tag_name" : "sample tag"
+    "tag_name" : "sample"
 }
 ###
-PUT {{url}}/2dbeb4fa-d321-4f83-9853-d37afc0f8027
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
+PUT {{url}}/cdee2832-6315-4796-9942-e8a5fe1991d8
+Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
@@ -23,8 +22,7 @@ Content-Type: application/json
 }
 ###
 
-DELETE {{url}}/2dbeb4fa-d321-4f83-9853-d37afc0f8027
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYjIxOTA4Yi1iNTVmLTQ3YjUtYjMzZi1jN2Y0ZWJlNjFiNTMiLCJ1c2VybmFtZSI6InZhbXNpY2giLCJ1c2VySW1hZ2VVcmwiOm51bGwsImVtYWlsIjoibmFnYXNhaS52YW1zaUBnN2NyLmNvbSIsInJvbGUiOiJ1c2VyIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0xNlQxMjo0OTo1MS40MDZaIiwiaWF0IjoxNzI5MzQ4NDkzLCJleHAiOjE3Mjk0MzQ4OTN9.woVBH_u-S9GKdTX8ZUdEwxUI_o3oOldfepI9-jupuyU
-
+DELETE {{url}}/cdee2832-6315-4796-9942-e8a5fe1991d8
+Authorization: Bearer {{user_token}}
 
 

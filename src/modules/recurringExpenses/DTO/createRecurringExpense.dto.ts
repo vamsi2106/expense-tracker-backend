@@ -1,10 +1,11 @@
-import { 
-  IsNotEmpty, 
-  IsOptional, 
-  IsString, 
-  IsEnum, 
-  IsBoolean, 
-  IsDate 
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsBoolean,
+  IsDate,
+  Matches
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotPastDate } from 'src/utility/dateValidation'; // Import your custom validator
@@ -75,13 +76,25 @@ export class CreateRecurringTaskDto {
   @IsEnum(RecurringInterval, { message: `Interval must be one of: ${Object.values(RecurringInterval).join(', ')}` })
   interval: RecurringInterval;
 
+  // @ApiProperty({
+  //   description: 'Specific time of day for execution (HH:MM:SS)',
+  //   type: String,
+  //   example: '09:00:00',
+  // })
+  // @IsNotEmpty({ message: 'Time is required.' })
+  // @IsString({ message: 'Time must be a string in HH:MM:SS format.' })
+  // time: string;
+
   @ApiProperty({
     description: 'Specific time of day for execution (HH:MM:SS)',
     type: String,
-    example: '09:00:00',
+    example: '03:10:00',
   })
   @IsNotEmpty({ message: 'Time is required.' })
-  @IsString({ message: 'Time must be a string in HH:MM:SS format.' })
+  @IsString({ message: 'Time must be a string.' })
+  @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/, {
+    message: 'Time must be in HH:MM:SS format',
+  })
   time: string;
 
   @ApiProperty({

@@ -32,7 +32,7 @@ export class ExpenseTagController {
     console.log(expenseId);
     console.log('called successdully with body', createExpenseTagDto);
     const { user_id } = req.user; // Retrieve userId from req.user
-    return this.expenseTagService.createExpenseTag(createExpenseTagDto, user_id,expenseId);
+    return await this.expenseTagService.createExpenseTag(createExpenseTagDto, user_id,expenseId);
   }
 
 
@@ -44,7 +44,7 @@ export class ExpenseTagController {
   async findById(@Param('expenseId') expenseId: string, @Req() req: any) {
     
     const userId = req.user.user_id; // Retrieve userId from req.user
-    return this.expenseTagService.getTagsForExpense(expenseId, userId);
+    return await this.expenseTagService.getTagsForExpense(expenseId, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -54,7 +54,7 @@ export class ExpenseTagController {
   @Get()
   async findAll( @Req() req: any) {
     const userId = req.user.user_id; // Retrieve userId from req.user
-    return this.expenseTagService.getALLTagsForExpense(userId);
+    return await this.expenseTagService.getALLTagsForExpense(userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -65,7 +65,8 @@ export class ExpenseTagController {
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateExpenseTagDto: CreateExpenseTagDto, @Req() req: any) {
     const userId = req.user.user_id; // Retrieve userId from req.user
-    return this.expenseTagService.updateExpenseTag(id, updateExpenseTagDto, userId);
+    let result = await this.expenseTagService.updateExpenseTag(id, updateExpenseTagDto, userId);
+    return result
   }
 
   @UseGuards(JwtAuthGuard)
@@ -76,7 +77,7 @@ export class ExpenseTagController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: any) {
     const userId = req.user.user_id; // Retrieve userId from req.user
-    await this.expenseTagService.deleteExpenseTag(id, userId);
-    return { message: 'Tag deleted successfully' };
+    let result = await this.expenseTagService.deleteExpenseTag(id, userId);
+    return result;
   }
 }

@@ -1,5 +1,6 @@
-import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, Default, ForeignKey, HasMany } from 'sequelize-typescript';
 import { User } from './user.model';
+import { Expense } from './expenses.models';
 
 @Table({ tableName: 'files' })
 export class File extends Model {
@@ -23,4 +24,7 @@ export class File extends Model {
 
   @Column({ type: DataType.INTEGER, allowNull: false })
   size: number; // The file size in bytes
+
+  @HasMany(()=>Expense, {foreignKey: 'file_id'})
+  expense: Expense[]
 }

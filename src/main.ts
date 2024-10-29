@@ -12,7 +12,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Configure the global validation pipe
+ // Configure the global validation pipe
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,               // Strip any properties that are not in the DTO
     forbidNonWhitelisted: true,    // Throw an error if extra properties are provided
@@ -29,8 +29,8 @@ async function bootstrap() {
 
   const port = configService.getServicePort() || 5000;
   await app.listen(port, () => {
-    appLogger.log(`Server running at http://localhost:${port}`);
-    appLogger.log(`Swagger running on http://localhost:${port}/api/docs`); 
+    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Swagger running on http://localhost:${port}/api/docs`); 
   });
 }
 

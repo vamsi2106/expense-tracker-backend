@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { Response } from 'express';
 import { ConfigServices } from 'src/config/appconfig.service';
+import { sasUrl } from './sasToken';
 
 @Injectable()
 export class AzureBlobStorageService {
@@ -13,9 +14,8 @@ export class AzureBlobStorageService {
 
   constructor() {
     this.blobServiceClient = BlobServiceClient.fromConnectionString(
-      "DefaultEndpointsProtocol=https;AccountName=g7crassessment;AccountKey=MdjED2cfsaXDZ9Dn9SyULHv77O3X0rQ+6GZTn4x807y5sgxe1uUSUwxiePf9t6tgvTKbfd6Thtlb+AStxkwvtw==;EndpointSuffix=core.windows.net"
+        this.configServices.getConnectionString()
     );
-    console.log(this.configServices.getConnectionString());
   }
   
   
@@ -27,15 +27,17 @@ export class AzureBlobStorageService {
     const blockBlobClient = containerClient.getBlockBlobClient(file.originalname);
 
     const uploadBlobResponse = await blockBlobClient.uploadData(file.buffer);
-    console.log(uploadBlobResponse,'uploadBlockResponse');
+    //console.log(uploadBlobResponse,'uploadBlockResponse');
     if (!uploadBlobResponse) {
       throw new Error('File upload to Azure failed');
     }
 
     // Log the upload event
     //await this.logEvent(`Uploaded file: ${file.originalname}`);
-    console.log(blockBlobClient,blockBlobClient);
-    return blockBlobClient.url; // Return the URL of the uploaded file
+    //console.log(blockBlobClient,blockBlobClient);
+    let fileLink = sasUrl(file.originalname);
+    //console.log(fileLink, 'sas link');
+    return fileLink; // Return the URL of the uploaded file
   }
 
   private async logEvent(message: string) {
@@ -70,6 +72,8 @@ export class AzureBlobStorageService {
 
     const downloadBlockBlobResponse = await blockBlobClient.download(0);
     const stream = downloadBlockBlobResponse.readableStreamBody;
+    console.log(downloadBlockBlobResponse, "download file");
+    console.log(stream, "stream")
 
     if (!stream) {
       throw new Error('Failed to download file');

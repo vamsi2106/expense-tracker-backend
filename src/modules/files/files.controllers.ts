@@ -10,6 +10,8 @@ import {
   HttpStatus,
   Delete,
   UseGuards,
+  Body,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './files.services';
@@ -19,10 +21,12 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } 
 import { RoleGuard } from '../auth/role.guard';
 import { Roles } from '../auth/role.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard';
+import { ResponseMessages } from 'src/common/messages';
+import { handleResponse } from 'src/common/handleResponse';
 
 @ApiTags('Files')
 @ApiBearerAuth() // Adds Authorization: Bearer token for protected routes
-@Controller('users/:userId/files')
+@Controller('files')
 export class FileController {
   constructor(
     private readonly fileService: FileService,
@@ -30,7 +34,6 @@ export class FileController {
   ) {}
 
   @ApiOperation({ summary: 'Upload a file for a user' })
-  @ApiParam({ name: 'userId', required: true, description: 'The ID of the user' })
   @ApiBody({
     description: 'File to upload',
     required: true,
@@ -44,29 +47,32 @@ export class FileController {
       },
     },
   })
-  @ApiResponse({
-    status: 201,
-    description: 'File uploaded successfully',
-    schema: {
-      example: {
-        message: 'File uploaded successfully',
-        file: {
-          fileName: 'example.png',
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'File uploaded successfully',
+  //   schema: {
+  //     example: {
+  //       message: 'File uploaded successfully',
+  //       file: {
+  //         fileName: 'example.png',
           
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 400, description: 'No file uploaded' })
+  //       },
+  //     },
+  //   },
+  // })
+ // @ApiResponse({ status: 400, description: 'No file uploaded' })
   @UseGuards(JwtAuthGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@Param('userId') userId: string, @UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@Req() req:any, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     }
 
     try {
+      console.log('response from file upload route',req.user);
+      let userId = req.user.user_id;
+      
       const fileUrl = await this.azureBlobService.uploadFile(file);
       const savedFile = await this.fileService.uploadFile(userId, file, fileUrl);
       return { message: 'File uploaded successfully', file: savedFile };
@@ -78,8 +84,19 @@ export class FileController {
     }
   }
 
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload/image')
+  async uploadImage(@UploadedFile() file: Express.Multer.File,@Body() name:string){
+    console.log("it is file",file, name);
+    if(!file){
+      return new HttpException(ResponseMessages.DataNot,HttpStatus.BAD_REQUEST);
+    }
+    let fileUrl = await this.azureBlobService.uploadFile(file);
+    console.log(fileUrl);
+    return handleResponse({status:HttpStatus.OK,response:fileUrl,message:ResponseMessages.PS});
+  }
+
   @ApiOperation({ summary: 'Get a file by ID' })
-  @ApiParam({ name: 'userId', required: true, description: 'The ID of the user' })
   @ApiParam({ name: 'id', required: true, description: 'The ID of the file' })
   @ApiResponse({
     status: 200,
@@ -96,13 +113,13 @@ export class FileController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getFile(@Param('userId') userId: string, @Param('id') id: string) {
+  async getFile(@Req() req:any, @Param('id') id: string) {
+    let userId = req.userId.id;
     const file = await this.fileService.getFileById(userId, id);
     return file;
   }
 
   @ApiOperation({ summary: 'Get all files for a user' })
-  @ApiParam({ name: 'userId', required: true, description: 'The ID of the user' })
   @ApiResponse({
     status: 200,
     description: 'All files retrieved',
@@ -125,12 +142,12 @@ export class FileController {
   })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllFiles(@Param('userId') userId: string) {
+  async getAllFiles(@Req() req:any) {
+    let userId = req.user.user_id;
     return this.fileService.getAllFiles(userId);
   }
 
   @ApiOperation({ summary: 'Download a file by ID' })
-  @ApiParam({ name: 'userId', required: true, description: 'The ID of the user' })
   @ApiParam({ name: 'id', required: true, description: 'The ID of the file to download' })
   @ApiResponse({
     status: 200,
@@ -140,14 +157,15 @@ export class FileController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @UseGuards(JwtAuthGuard)
   @Get('download/:id')
-  async downloadFile(@Param('userId') userId: string, @Param('id') id: string, @Res() res: Response) {
+  async downloadFile(@Param('id') id: string, @Req() req: any) {
+    let userId = req.user.user_id;
     const file = await this.fileService.getFileById(userId, id);
     if (!file) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
 
     try {
-      await this.azureBlobService.downloadFileToResponse(file.fileUrl, res);
+      return await this.azureBlobService.downloadFileToResponse(file.originalFileName, req);
     } catch (error) {
       throw new HttpException(
         `File download failed: ${error.message}`,
@@ -172,7 +190,8 @@ export class FileController {
   @ApiResponse({ status: 404, description: 'File does not exist to delete it' })
   @UseGuards(JwtAuthGuard)
   @Delete('/delete/:id')
-  async remove(@Param('userId') userId: string, @Param('id') id: string) {
+  async remove(@Req() req:any, @Param('id') id: string) {
+    let userId = req.user.user_id;
     let fileData = await this.fileService.getFileById(userId,id);
     if(fileData){
           let response = this.azureBlobService.deleteFile(fileData.originalFileName);

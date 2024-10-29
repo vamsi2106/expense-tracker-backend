@@ -9,7 +9,7 @@ import { RecurringExpenseDao } from "src/database/mssql/dao/recurringExpenses.da
 import { RecurringTask } from "src/database/mssql/models/recurringExpenses.models";
 
 @Module({
-    imports : [SequelizeModule.forFeature([Expense,Category,RecurringTask])],
-    providers : [TaskService,ExpenseDao,CategoryDao,RecurringExpenseDao]
+imports : [SequelizeModule.forFeature([Expense,Category,RecurringTask])],
+providers : [TaskService,ExpenseDao,CategoryDao,RecurringExpenseDao]
 })
 export class TaskManager{}

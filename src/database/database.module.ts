@@ -8,10 +8,13 @@ import { Expense } from './mssql/models/expenses.models';
 import { ExpenseDao } from './mssql/dao/expenses.dao';
 import { DaoList, SchemasList } from './mssql/connection/schemas.mssql';
 import { Category } from './mssql/models/category.models';
+//import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter';
+import { GlobalModule } from 'src/logger/globalModule';
+import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter';
 
 @Module({
-  imports: [DatabaseConfigService, SequelizeModule.forFeature(SchemasList)],
-  providers: [DatabaseService, ...DaoList],
-  exports: [DatabaseService, ...DaoList],
+  imports: [GlobalModule,DatabaseConfigService, SequelizeModule.forFeature(SchemasList)],
+  providers: [DatabaseService,...DaoList, GlobalExceptionFilter],
+  exports: [DatabaseService, ...DaoList, GlobalExceptionFilter],
 })
 export class DbModule {}

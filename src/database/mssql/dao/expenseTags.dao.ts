@@ -4,107 +4,130 @@ import { CreateExpenseTagDto } from 'src/modules/expenseTags/DTO/createExpenseTa
 import { Sequelize, Sequelize as sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
 import { userInfo } from 'os';
+import { TryCatchBlock } from 'src/common/tryCatchBlock';
+import { handleResponse, ResponseSchema } from 'src/common/handleResponse';
+import { ResponseMessages } from 'src/common/messages';
 
 
 @Injectable()
 export class ExpenseTagDao {
-constructor(
-  @Inject(Sequelize)
-  private sequelize:Sequelize
-){}
-async createTag(expenseTagData: CreateExpenseTagDto, user_id: string, expenseId: string): Promise<ExpenseTag> {
-  try {
-    const expenseDataResult = {
-      user_id: user_id,
-      expense_id: expenseId,
-      tag_name: expenseTagData.tag_name,
-    };
-
-    // Prepare the SQL query to check for existing tags
-    const expenseDataQuery = `
-      SELECT * FROM expense_tags 
-      WHERE expense_id = :expenseId 
-      AND user_id = :userId 
-      AND tag_name = :tagName;
-    `;
-
-    // Execute the query
-    const [result] = await this.sequelize.query(expenseDataQuery, {
-      replacements: {
-        expenseId,
-        userId: user_id,
-        tagName: expenseDataResult.tag_name,
-      },
-      type: QueryTypes.SELECT,
-    });
-
-    // If a tag already exists, throw an exception
-    if (result) {
-      throw new HttpException('Tag already exists for this expense', HttpStatus.CONFLICT);
-    }
-
-    // Create a new ExpenseTag entry
-    return await ExpenseTag.create(expenseDataResult);
-  } catch (error) {
-    // Log the error and throw an internal server error
-    console.error('Error creating tag:', error);
-    throw new HttpException(error.response, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-}
-
-  async getTagsByExpenseId(expenseId: string, userId: string): Promise<ExpenseTag[]> {
-    const tags = await ExpenseTag.findAll({
-      where: {
+  constructor(
+    @Inject(Sequelize)
+    private sequelize: Sequelize
+  ) { }
+  async createTag(expenseTagData: CreateExpenseTagDto, user_id: string, expenseId: string): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      const expenseDataResult = {
+        user_id: user_id,
         expense_id: expenseId,
-        user_id: userId,
-      },
-    });
+        tag_name: expenseTagData.tag_name,
+      };
 
-    if (!tags.length) {
-      throw new HttpException('No tags found for this expense', HttpStatus.NOT_FOUND);
-    }
+      const expenseDetails = await this.sequelize.query(`SELECT * FROM expenses 
+                              WHERE id=:expenseId`, {
+        replacements: {
+          expenseId
+        },
+        type: QueryTypes.SELECT
+      })
+      if (expenseDetails.length == 0) {
+        return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.ENExist })
+      }
 
-    return tags;
+      // Prepare the SQL query to check for existing tags
+      const expenseDataQuery = `
+                                SELECT * FROM expense_tags 
+                                WHERE user_id = :userId
+                                AND expense_id = :expenseId
+                                OR tag_name = :tagName;
+                                `;
+
+      // Execute the query
+      const [result] = await this.sequelize.query(expenseDataQuery, {
+        replacements: {
+          userId: user_id,
+          expenseId,
+          tagName: expenseDataResult.tag_name,
+        },
+        type: QueryTypes.SELECT,
+      });
+
+      // If a tag already exists, throw an exception
+      if (result) {
+        return handleResponse({ status: HttpStatus.CONFLICT, message: ResponseMessages.DExist });
+      }
+
+      // Create a new ExpenseTag entry
+      let response = await ExpenseTag.create(expenseDataResult);
+
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.PS, response })
+    })
   }
-  async getTagsByExpense(userId: string): Promise<any> {
-    try{
+
+  async getTagsByExpenseId(expenseId: string, userId: string): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      const tags = await ExpenseTag.findAll({
+        where: {
+          expense_id: expenseId,
+          user_id: userId,
+        },
+      });
+
+      // if (!tags.length) {
+      //   return handleResponse({message:ResponseMessages.,status:HttpStatus.NOT_FOUND});
+      // }
+
+      return handleResponse({ message: ResponseMessages.GS, status: HttpStatus.OK, response: tags });
+    })
+  }
+
+  async getTagsByExpense(userId: string): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
       const query = `
-      SELECT et.*, e.*
+      SELECT et.id as expense_tag_id, e.id as expense_id, et.*, e.*
       FROM expense_tags et
       LEFT JOIN expenses e ON e.id = et.expense_id 
       WHERE et.user_id = :userId;
     `;
 
-    // Execute the raw SQL query
-    const [results, metadata] = await this.sequelize.query(query, {
+    // const query = `
+    // SELECT * FROM expenses`
+
+      // Execute the raw SQL query
+      const response = await this.sequelize.query(query, {
       replacements: { userId },  // Safely pass the userId into the query
-      type: QueryTypes.SELECT, // Ensure we are selecting data
-    });
+        type: QueryTypes.SELECT, // Ensure we are selecting data
+      });
 
-    console.log(results);  // Log the results for debugging
-    return results;}
-    catch(error){
-      console.log(error);
-      return (error);
-    }        // Return the results
-  }
-  async updateTag(id: string, updateData: Partial<ExpenseTag>, userId: string): Promise<ExpenseTag> {
-    const tag = await ExpenseTag.findOne({ where: { id, user_id: userId } });
-
-    if (!tag) {
-      throw new HttpException('Tag not found', HttpStatus.NOT_FOUND);
-    }
-
-    return tag.update(updateData);
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response });
+    })
   }
 
-  async deleteTag(id: string, userId: string): Promise<void> {
-    const tag = await ExpenseTag.findOne({ where: { id, user_id: userId } });
+  async updateTag(id: string, updateData: Partial<ExpenseTag>, userId: string): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      const tag = await ExpenseTag.findOne({ where: { id, user_id: userId } });
 
-    if (!tag) {
-      throw new HttpException('Tag not found', HttpStatus.NOT_FOUND);
-    }
+      if (!tag) {
+        return handleResponse({ message: ResponseMessages.DataNot, status: HttpStatus.NOT_FOUND });
+      }
 
-    await tag.destroy();
+      let response = await tag.update(updateData);
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.PutS, response })
+    })
   }
+
+  async deleteTag(id: string, userId: string): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      const tag = await ExpenseTag.findOne({ where: { id, user_id: userId } });
+      console.log(!tag);
+      if (!tag) {
+        console.log('called');
+        return handleResponse({status:HttpStatus.NOT_FOUND,message:ResponseMessages.DataNot})  
+      }
+
+      let response = await tag.destroy();
+      return handleResponse({ message: ResponseMessages.DataNot, status: HttpStatus.OK, response });
+    })
+  }
+
 }
