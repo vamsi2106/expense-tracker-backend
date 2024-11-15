@@ -1,16 +1,21 @@
 // src/modules/users/users.module.ts
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
-import { DbModule } from 'src/database/database.module';
-import { UserDao } from 'src/database/mssql/dao/user.dao';
-import { CustomSendGridModule } from '../sendgrid/sendgrid.module';
 import { EmailModule } from 'src/email/email.module';
+import { CustomSendGridModule } from '../sendgrid/sendgrid.module';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+import { AbstractUser } from './user.abstract';
 
 @Module({
-  imports: [DbModule, CustomSendGridModule, EmailModule],
-  providers: [UsersService],
+  imports: [CustomSendGridModule, EmailModule],
+  providers: [{
+    provide: AbstractUser,
+    useClass: UsersService
+  }],
   controllers: [UsersController],
-  exports: [UsersService],
+  exports: [{
+    provide: AbstractUser,
+    useClass: UsersService
+  }],
 })
-export class UsersModule {}
+export class UsersModule { }

@@ -108,7 +108,7 @@ import {
   ValidationError,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AppLogger } from './app-logger';
+import AppLogger from './app-logger';
 import { ResponseMessages } from 'src/common/messages';
 
 @Catch()
@@ -156,15 +156,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         errorMessage.error = 'Database Error';
         
         // Log the actual error for debugging but don't send to client
-        this.appLogger.logError({
+        this.appLogger.log({
           ...errorMessage,
           detail: (exception as any).detail,
           code: (exception as any).code
-        }, status, {
-          path: request.url,
-          method: request.method,
-          body: request.body,
-        });
+        }, status, 
+        // {
+        //   path: request.url,
+        //   method: request.method,
+        //   body: request.body,
+        // }
+      );
       } else if (exception instanceof Error) {
         // Handle standard JavaScript errors
         errorMessage.message = exception.message;
@@ -192,22 +194,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       this.sanitizeErrorResponse(errorMessage);
 
       // Log the error
-      this.appLogger.logError(
+      this.appLogger.log(
         {
           ...errorMessage,
           originalError: exception instanceof Error ? exception.stack : null
         },
         status,
-        {
-          path: request.url,
-          method: request.method,
-          body: this.sanitizeRequestBody(request.body),
-        }
+        // {
+        //   path: request.url,
+        //   method: request.method,
+        //   body: this.sanitizeRequestBody(request.body),
+        // }
       );
 
     } catch (error) {
       // If error handling itself fails, return a generic error
-      console.error('Error in exception filter:', error);
       errorMessage = {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         timestamp: new Date().toISOString(),

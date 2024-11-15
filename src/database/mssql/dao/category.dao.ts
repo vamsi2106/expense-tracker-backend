@@ -1,12 +1,20 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { Category } from '../models/category.models'; // Adjust the import path as needed
 import { Op } from 'sequelize';
 import { handleResponse, ResponseSchema } from 'src/common/handleResponse';
 import { ResponseMessages } from 'src/common/messages';
 import { TryCatchBlock } from 'src/common/tryCatchBlock';
+import { queryCategory } from 'src/modules/categories/DTO/queryCategory.dto';
+import { AbstractCategoryDao } from '../abstract/categoryDao.abstract';
+import { msSqlConstants } from '../connection/constants.mssql';
 
 @Injectable()
-export class CategoryDao {
+export class CategoryDao implements AbstractCategoryDao {
+
+    constructor(
+        @Inject(msSqlConstants.Category)
+        private readonly categoryModel: typeof Category
+    ) { }
 
     async createCategory(categoryData: Partial<Category>, role: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
@@ -45,8 +53,7 @@ export class CategoryDao {
 
     async deleteCategory(id: string, userId: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            const category = await Category.findOne({ where: { id, user_id: userId } });
-            console.log(!category);
+            const category = await this.categoryModel.findOne({ where: { id, user_id: userId } });
             if (!category) {
                 return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.CNot });
             }
@@ -58,7 +65,7 @@ export class CategoryDao {
 
     async getCategoryByName(name: string, userId: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            const category = await Category.findOne({
+            const category = await this.categoryModel.findOne({
                 where: {
                     [Op.or]: [
                         { name, user_id: userId },
@@ -77,7 +84,7 @@ export class CategoryDao {
 
     async getCategoryById(id: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            const category = await Category.findOne({ where: { id } });
+            const category = await this.categoryModel.findOne({ where: { id } });
 
             if (!category) {
                 return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.CNot });
@@ -87,8 +94,9 @@ export class CategoryDao {
         });
     }
 
-    async getAllCategories(userId: string, name?: string): Promise<ResponseSchema> {
+    async getAllCategories(userId: string, params: queryCategory): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
+            let { name } = params;
             const whereClause: any = [
                 { user_id: userId },
                 { default_category: true }
@@ -98,7 +106,7 @@ export class CategoryDao {
                 whereClause[0].name = name;
             }
 
-            const categories = await Category.findAll({
+            const categories = await this.categoryModel.findAll({
                 where: {
                     [Op.or]: whereClause
                 }
@@ -108,31 +116,43 @@ export class CategoryDao {
         });
     }
 
-    async getUserCategories(userId: string, name?: string): Promise<ResponseSchema> {
+    async getUserCategories(userId: string, params: queryCategory): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
+            let { name, limit, offset } = params;
             const whereClause: any = [{ user_id: userId }];
 
             if (name) {
                 whereClause[0].name = name;
             }
+            if (!limit) {
+                limit = 50;
+            }
+            if (!offset) {
+                offset: 0;
+            }
 
-            const categories = await Category.findAll({
+            const categories = await this.categoryModel.findAll({
                 where: {
                     [Op.or]: whereClause
-                }
+                },
+                limit,
+                offset
             });
 
             if (categories.length === 0) {
-                return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.CNot });
+                return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: categories });
             }
+            let size = await Category.count({
+                where: { user_id: userId }
+            });
 
-            return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.CG, response: categories });
+            return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.CG, response: categories, size });
         });
     }
 
     async updateCategory(id: string, categoryData: Partial<Category>, userId: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            const category = await Category.findOne({ where: { id, user_id: userId, default_category: false } });
+            const category = await this.categoryModel.findOne({ where: { id, user_id: userId, default_category: false } });
 
             if (!category) {
                 return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.CNot });
@@ -141,5 +161,14 @@ export class CategoryDao {
             await category.update(categoryData);
             return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.CPut, response: category });
         });
+    }
+
+    async getCategorySize(user_id): Promise<ResponseSchema> {
+        return TryCatchBlock(async () => {
+            let response = await this.categoryModel.count({
+                where: { user_id }
+            });
+            return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: { size: response } })
+        })
     }
 }

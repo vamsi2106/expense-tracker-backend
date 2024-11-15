@@ -5,17 +5,18 @@ import {
   IsEnum,
   IsBoolean,
   IsDate,
-  Matches
+  Matches,
+  IsNumber
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotPastDate } from 'src/utility/dateValidation'; // Import your custom validator
+import { IsNotPastDate } from 'src/core/utility/dateValidation'; // Import your custom validator
 import { Type } from 'class-transformer';
 
 export enum RecurringInterval {
   DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
+  WEEKLY = 'week',
+  MONTHLY = 'month',
+  YEARLY = 'year',
   HOURLY = 'hour',
   MINUTE = 'minute',
 }
@@ -90,12 +91,21 @@ export class CreateRecurringTaskDto {
     type: String,
     example: '03:10:00',
   })
-  @IsNotEmpty({ message: 'Time is required.' })
+  @IsOptional()
   @IsString({ message: 'Time must be a string.' })
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/, {
     message: 'Time must be in HH:MM:SS format',
   })
   time: string;
+
+  @ApiProperty({
+    description: 'Number of times the expense should be added in week,month,year intervals',
+    type:Number,
+    example:3
+  })
+  @IsOptional()
+  @IsNumber()
+  count:number;
 
   @ApiProperty({
     description: 'Whether the task is active or not',

@@ -1,14 +1,16 @@
 export interface ResponseSchema{
     status:number,
     message:string,
-    response?:any
+    response?:any,
+    size?:number
 }
 
-export function handleResponse({status,message,response}:ResponseSchema){
+export function handleResponse({status,message,response,size}:ResponseSchema){
     return {
         status,
         message,
-        response
+        response,
+        size
     }
 }
 

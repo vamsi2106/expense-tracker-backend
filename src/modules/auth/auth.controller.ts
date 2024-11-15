@@ -5,12 +5,12 @@ import {
   Body,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
+import { AbstractAuth } from './auth.abstract';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AbstractAuth) {}
 
   @ApiOperation({ summary: 'Get authentication URL' })
   @ApiResponse({

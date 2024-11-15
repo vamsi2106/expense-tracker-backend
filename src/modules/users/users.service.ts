@@ -4,10 +4,16 @@ import { UserDao } from '../../database/mssql/dao/user.dao';
 import { User } from '../../database/mssql/models/user.model';
 import { Role } from 'src/core/enums/roles.enum';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { AbstractUserDao } from 'src/database/mssql/abstract/userDao.abstract';
+import { DatabaseService } from 'src/database/database.service';
+import { AbstractUser } from './user.abstract';
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly userDao: UserDao) {}
+export class UsersService implements AbstractUser{
+  private readonly _userTxn: AbstractUserDao
+  constructor(private readonly _dbSvc: DatabaseService) {
+    this._userTxn = _dbSvc.userSqlTxn;
+  }
 
   async createUser(
     username: string,
@@ -16,7 +22,7 @@ export class UsersService {
     userImageUrl?: any,
   ): Promise<User> {
     try {
-      const user = await this.userDao.createUser(
+      const user = await this._userTxn.createUser(
         username,
         email,
         role,
@@ -30,25 +36,29 @@ export class UsersService {
   }
 
   async findAllUsers(): Promise<User[]> {
-    return await this.userDao.findAll();
+    return await this._userTxn.findAll();
   }
 
   async findUserById(id: string) {
-    return await this.userDao.findUserById(id);
+    return await this._userTxn.findUserById(id);
   }
 
   async findUserByName(username: string) {
-    return await this.userDao.findUserByName(username);
+    return await this._userTxn.findUserByName(username);
   }
   async findUserByEmail(email: string) {
-    return await this.userDao.findUserByEmail(email);
+    return await this._userTxn.findUserByEmail(email);
   }
 
   async updateUserById(id: string, userData: Partial<User>) {
-    return await this.userDao.updateUserById(id, userData);
+    return await this._userTxn.updateUserById(id, userData);
   }
 
   async deleteUserById(id: string) {
-    return await this.userDao.deleteUserById(id);
+    return await this._userTxn.deleteUserById(id);
+  }
+
+  async getSize(){
+    return await this._userTxn.getUserSize();
   }
 }

@@ -1,10 +1,24 @@
 @url = http://localhost:5000/files
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZjQzYWQ0MS03OTg3LTQ0NTAtYjY1OS0yN2U3MDJkNWZkZWEiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQwNToxNjo1Ny43NzhaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQwNToxNjo1Ny43NzhaIiwiaWF0IjoxNzI5ODMzNDk0LCJleHAiOjE3MzAwOTI2OTR9.aXnMxXbbWMfRSiV4kwvSsAVc9szGMObzaIo9jSpdwcc
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOWJjNTAyZS02NzJlLTQxZmEtOWUzYy1mYThiNjA5ODk3YTYiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwiaWF0IjoxNzMxMDcxMTAxLCJleHAiOjE3MzEzMzAzMDF9.BsElu-XJQOhD5ePyWcRDBhn-jMNE0V4uj7b40Xqjc34
+POST  {{url}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name" : "renamed_with_correct_columns.csv",
+    "limit":10,
+    "offset":0
+}
+###
 
 GET {{url}}
+Authorization: Bearer {{token}}
+###
+
+GET {{url}}/fetch/size
 Accept: application/json
 Authorization: Bearer {{token}}
 ###
 
-DELETE {{url}}/delete/ca3ff4ef-3589-43d4-a6bb-7cd4c245bdf4
+DELETE {{url}}/delete/bf9d930e-862d-4851-8a4f-663ed726871f
 Authorization: Bearer {{token}}

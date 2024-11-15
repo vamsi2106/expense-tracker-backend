@@ -1,34 +1,36 @@
 import { Injectable, HttpException, HttpStatus } from "@nestjs/common"; // Import HttpException and HttpStatus
 import { ResponseSchema } from "src/common/handleResponse";
-import { CategoryDao } from "src/database/mssql/dao/category.dao";
 import { Category } from "src/database/mssql/models/category.models";
+import { queryCategory } from "./DTO/queryCategory.dto";
+import { DatabaseService } from "src/database/database.service";
+import { AbstractCategory } from "./category.abstract";
+import { AbstractCategoryDao } from "src/database/mssql/abstract/categoryDao.abstract";
 
 @Injectable()
-export class CategoryService {
-  constructor(private readonly categoryDao: CategoryDao) {}
+export class CategoryService implements AbstractCategory{
+  private readonly _categoryTxn: AbstractCategoryDao
+  constructor(private readonly _dbSvc:DatabaseService) {
+    this._categoryTxn=_dbSvc.categorySqlTxn;
+  }
 
   async createCategory(categoryData: Partial<Category>, role: string): Promise<ResponseSchema> {
-    let data =  await this.categoryDao.createCategory(categoryData, role);
+    let data =  await this._categoryTxn.createCategory(categoryData, role);
     return data;
   }
 
   async deleteCategory(id: string, userId: string): Promise<ResponseSchema> {
-     return await this.categoryDao.deleteCategory(id, userId);
+     return await this._categoryTxn.deleteCategory(id, userId);
   }
 
-  async getAllCategories(userId: string, name?: string): Promise<ResponseSchema> {
-     return await this.categoryDao.getAllCategories(userId, name);
+  async getAllCategories(userId: string, params:queryCategory): Promise<ResponseSchema> {
+     return await this._categoryTxn.getAllCategories(userId, params);
   }
 
-  async getUSerExpenses(userId:string,name?:string):Promise<ResponseSchema>{
-    return await this.categoryDao.getUserCategories(userId,name);
+  async getUserCategories(userId:string,params:queryCategory):Promise<ResponseSchema>{
+    return await this._categoryTxn.getUserCategories(userId,params);
   }
 
   async updateCategory(id: string, categoryData: Partial<Category>, userId: string): Promise<ResponseSchema> {
-    const category = await this.categoryDao.updateCategory(id, categoryData, userId);
-    if (!category) {
-      throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
-    }
-    return category;
+    return await this._categoryTxn.updateCategory(id, categoryData, userId);
   }
 }

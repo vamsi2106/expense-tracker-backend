@@ -1,32 +1,32 @@
-import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SchemasList } from './schemas.mssql';
+import { AppConfigService } from 'src/config/appConfig.services';// Adjust the import according to your project
+import { Sequelize } from 'sequelize-typescript';
+import { msSqlConstants } from './constants.mssql';
+import { models } from './models.connection.mssql';
+import AppLogger from 'src/core/logger/app-logger';
 
-export const DatabaseConfigService = SequelizeModule.forRootAsync({
-  imports: [ConfigModule],
-  inject: [ConfigService],
-  useFactory: (configService: ConfigService): SequelizeModuleOptions => ({
-    dialect: 'mssql',
-    host: configService.get<string>('DB_HOST'),
-    port: configService.get<number>('DB_PORT'),
-    database: configService.get<string>('DB_NAME'),
-    dialectOptions: {
-      authentication: {
-        type: 'ntlm',
-        options: {
-          domain: configService.get<string>('DB_DOMAIN'),
-          userName: configService.get<string>('DB_USERNAME'),
-          password: configService.get<string>('DB_PASSWORD'),
-        },
-      },
-      options: {
-        encrypt: true, // Set to true if your SQL Server requires encryption
-        trustServerCertificate: true, // Set to true for development only
-        enableArithAbort: true, // Required for certain configurations
-      },
-    },
-    models:[...SchemasList],
-    autoLoadModels: true,
-    synchronize: true, // Use with caution in production; consider migrations instead
-  }),
-});
+export const DatabaseConfigService =[
+  {
+  provide : msSqlConstants.SequelizeProvider,
+  inject: [AppConfigService, AppLogger],
+  useFactory: async (configDetails: AppConfigService, logger:AppLogger): Promise<any> => {
+    const sequelize: Sequelize = null;
+    try {
+      // Fetch the DB config from AppConfigService
+      const dbConfig = configDetails.get('db').mssql,
+      sequelize = new Sequelize({
+        ...dbConfig
+      });
+      
+      // Try to authenticate the connection
+      sequelize.addModels([...models]);
+				await sequelize.authenticate();
+      logger.log('Database connection established successfully');
+
+      // Return Sequelize configuration options for NestJS
+      return sequelize;
+    } catch (error) {
+      logger.error('Database connection error:', error);
+      throw new Error('Failed to connect to the database');
+    }
+  },
+}];

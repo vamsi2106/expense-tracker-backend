@@ -1,66 +1,79 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { RecurringTask } from "../models/recurringExpenses.models";
-import { InjectModel } from "@nestjs/sequelize";
 import { Sequelize } from 'sequelize-typescript';
 import { CreateRecurringTaskDto } from "src/modules/recurringExpenses/DTO/createRecurringExpense.dto";
 import { UpdateRecurringTaskDto } from "src/modules/recurringExpenses/DTO/updateRecurringExpense.dto";
-import { QueryTypes } from "sequelize";
+import { Op } from "sequelize";
 import { handleResponse, ResponseSchema } from "src/common/handleResponse";
 import { TryCatchBlock } from "src/common/tryCatchBlock";
 import { ResponseMessages } from "src/common/messages";
+import { RecurringExpenseFilter } from "src/modules/recurringExpenses/DTO/recurringExpenseFilter.Dto";
+import { AbstractRecurringExpenseDao } from "../abstract/recurringExpenseDao.abstract";
+import { msSqlConstants } from "../connection/constants.mssql";
+import AppLogger from "src/core/logger/app-logger";
 
 @Injectable()
-export class RecurringExpenseDao {
+export class RecurringExpenseDao implements AbstractRecurringExpenseDao{
     constructor(
-        @InjectModel(RecurringTask)
+        @Inject(msSqlConstants.RecurrinTask)
         private readonly recurringTaskModel: typeof RecurringTask,
+        private readonly _logger : AppLogger
+    ) {}
 
-        @Inject(Sequelize)
-        private sequelize: Sequelize
-    ) { }
-
-    async getAllTasks(userId: string): Promise<ResponseSchema> {
+    async getAllTasks(userId: string, filterParameters: RecurringExpenseFilter): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            let data = await this.recurringTaskModel.findAll({ where: { user_id: userId } });
-            return handleResponse({ status: HttpStatus.OK, response: data, message: ResponseMessages.GS });
-        })
+            const { name, start_date, end_date, interval, time, is_active, limit = 50, offset = 0 } = filterParameters;
+    
+            const whereCondition: any = {
+                user_id: userId
+            };
+    
+            if (name) {
+                whereCondition.name = { [Op.like]: `%${name}%` };
+            }
+    
+            if (start_date) {
+                whereCondition.start_date = { [Op.gte]: start_date };
+            }
+    
+            if (end_date) {
+                whereCondition.end_date = { [Op.lte]: end_date };
+            }
+    
+            if (interval) {
+                whereCondition.interval = { [Op.in]: interval.split(',') };
+            }
+    
+            if (time) {
+                whereCondition.time = time;
+            }
+    
+            if (typeof is_active !== 'undefined') {
+                whereCondition.is_active = is_active;
+            }
+    
+            const data = await this.recurringTaskModel.findAll({
+                where: whereCondition,
+                limit,
+                offset
+            });
+            let size = await RecurringTask.count({
+                where: { user_id:userId }
+            });
+    
+            return handleResponse({ status: HttpStatus.OK, response: data, message: ResponseMessages.GS, size });
+        });
     }
 
-    async getAllActiveTasks(): Promise<ResponseSchema> {
+    async getAllActiveTasks():Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
-            let query = await this.recurringTaskModel.findAll({where : {is_active : true}})
-
-            //console.log(query);
+            let query = await this.recurringTaskModel.findAll({ where: { is_active: true } })
             return handleResponse({ status: HttpStatus.OK, response: query, message: ResponseMessages.GS });
         })
 
     }
 
-
-    // async createTask(createDto: CreateRecurringTaskDto, userId: string, expenseId) {
-    //     return TryCatchBlock(async () => {
-    //         console.log({ ...createDto, user_id: userId, expense_id: expenseId });
-    //         let {start_date} = createDto;
-    //         let dateTransformation = new Date(start_date);
-    //         let currentDate = new Date();
-    //         currentDate.setHours(0, 0, 0, 0,);
-
-    //         if(dateTransformation<currentDate){
-    //             return handleResponse({status : HttpStatus.BAD_REQUEST, message:ResponseMessages.INVALID});
-    //         } 
-
-    //         let IsExist = await this.recurringTaskModel.findOne({where : {name:createDto.name,user_id : userId}})
-    //         if(IsExist){
-    //             return handleResponse({status: HttpStatus.CONFLICT,message:ResponseMessages.RExist})
-    //         }
-    //         const task = await this.recurringTaskModel.create({ ...createDto, user_id: userId, expense_id: expenseId });
-    //         return handleResponse({ status: HttpStatus.OK, response: task, message: ResponseMessages.PS });
-    //     })
-    // }
-
-
-
-    async createTask(createDto: CreateRecurringTaskDto, userId: string, expenseId: string) {
+    async createTask(createDto: CreateRecurringTaskDto, userId: string, expenseId: string): Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
             // Validate date
             const startDate = new Date(createDto.start_date);
@@ -77,7 +90,10 @@ export class RecurringExpenseDao {
             // Check for existing task
             const isExist = await this.recurringTaskModel.findOne({
                 where: {
-                    name: createDto.name,
+                    [Op.or]: [
+                        { name: createDto.name, },
+                        { expense_id: expenseId, }
+                    ],
                     user_id: userId
                 }
             });
@@ -85,10 +101,10 @@ export class RecurringExpenseDao {
             if (isExist) {
                 return handleResponse({
                     status: HttpStatus.CONFLICT,
-                    message: ResponseMessages.RExist
+                    message: ResponseMessages.DExist
                 });
             }
-
+            createDto.is_active = true;
             // Create task
             const task = await this.recurringTaskModel.create({
                 ...createDto,
@@ -104,8 +120,7 @@ export class RecurringExpenseDao {
         });
     }
 
-
-    async deleteTask(id: string, userId: string) {
+    async deleteTask(id: string, userId: string):Promise<ResponseSchema> {
         try {
             const task = await this.recurringTaskModel.findOne({ where: { id, user_id: userId } });
             if (!task) {
@@ -114,8 +129,7 @@ export class RecurringExpenseDao {
             let response = await task.destroy();
             return handleResponse({ message: ResponseMessages.DS, status: HttpStatus.OK, response }); // Return a success message
         } catch (err) {
-            console.error(err); // log the full error
-            throw new HttpException('Unable to delete task', HttpStatus.INTERNAL_SERVER_ERROR);
+            return handleResponse({message:ResponseMessages.DE, status:HttpStatus.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -141,7 +155,7 @@ export class RecurringExpenseDao {
         })
     }
 
-    async updateTaskToDeactivate(id: string) {
+    async updateTaskToDeactivate(id: string):Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
             const task = await this.recurringTaskModel.findOne({ where: { id } });
             if (!task) {
@@ -152,14 +166,22 @@ export class RecurringExpenseDao {
         })
     }
 
-
-    async getById(id: string, userId: string) {
+    async getById(id: string, userId: string):Promise<ResponseSchema> {
         return TryCatchBlock(async () => {
             const task = await this.recurringTaskModel.findOne({ where: { id, user_id: userId } });
             if (!task) {
                 throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
             }
             return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: task });
+        })
+    }
+
+    async getRecurringExpenseSize(user_id:string):Promise<ResponseSchema> {
+        return TryCatchBlock(async () => {
+            let response = await RecurringTask.count({
+                where: { user_id }
+            });
+            return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: { size: response } })
         })
     }
 }

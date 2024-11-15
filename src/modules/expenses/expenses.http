@@ -1,24 +1,47 @@
 @url = http://localhost:5000/tracker/expenses
-@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOWJjNTAyZS02NzJlLTQxZmEtOWUzYy1mYThiNjA5ODk3YTYiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwiaWF0IjoxNzI5ODU5ODc4LCJleHAiOjE3MzAxMTkwNzh9.mJbwW1z4baq4ddgjVsM_7co84L2fqmC9TpRYlR48EYs
-GET {{url}}
+@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOWJjNTAyZS02NzJlLTQxZmEtOWUzYy1mYThiNjA5ODk3YTYiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwiaWF0IjoxNzMxNTg3Nzg2LCJleHAiOjE3MzE4NDY5ODZ9.c2_4oF06072a9i_KXSpTXatJVm-DONYPJnnmzYqMHhY
+GET {{url}}/0332dd72-1c9e-44e3-b178-a56dbc765479
 Accept: application/json
 Authorization: Bearer {{admin_token}}
 ###
 
-GET {{url}}/4d1c9059-989c-423d-9fd1-7c3fd2621593
-Accept: application/json
+POST {{url}}/fetch/data
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+    "name" : 10,
+    "transaction_type":"expense",
+    "min_price" : 10,
+    "max_price" : 100,
+    "currency" : "INR,USD"
+    
+
+}
+###
+
+GET {{url}}?transaction_type=income
 Authorization: Bearer {{admin_token}}
 ###
 
-//to fetch expenses from start-date to end date
-GET {{url}}?startDate=2024-1-01&endDate=2024-10-14
+GET {{url}}/fetch/size
 Authorization: Bearer {{admin_token}}
 ###
 
+GET {{url}}?min_price=10000
+Authorization: Bearer {{admin_token}}
+###
 
+GET {{url}}?max_price=10
+Authorization: Bearer {{admin_token}}
+###
+
+GET {{url}}?currency=INR,EUR
+Authorization: Bearer {{admin_token}}
+###
 
 //to fetch the data related to the category
-GET {{url}}?filter=Saree
+GET {{url}}?limit=10&offset=10&name=Marrage shopping&currency=INR&transaction_type=expense&min_price=10&max_price=10000&start_date=2024-10-12&end_date=2024-11-12
 Accept: application/json
 Authorization : Bearer {{admin_token}}
 ###
@@ -30,7 +53,7 @@ Authorization: Bearer {{admin_token}}
 {
     "amount" : 10,
     "date": "2024-04-10",
-    "name": "Marrage shopping",
+    "name": "done",
     "category": "Shopping",
     "transaction_type": "expense",
     "currency": "INR"
@@ -59,20 +82,20 @@ GET {{url}}/filter/group-by-date?offset=0
 Authorization: Bearer {{admin_token}}
 ###
 
-GET {{url}}/filter/group-by-category?startDate=2024-01-01&endDate=2024-12-12
+GET {{url}}/filter/group-by-category?start_date=2024-01-01&file_id=59cf6453-6a5f-4b9a-8667-c800c0ac9ab0
 Authorization: Bearer {{admin_token}}
 
 ###
 
-GET {{url}}/filter/group-by-category
+GET {{url}}/filter/group-by-category?
 Authorization: Bearer {{admin_token}}
 ###
 
-GET {{url}}/filter/group-by-week?month=1
+GET {{url}}/filter/group-by-week?month=11&year=2024
 Authorization: Bearer {{admin_token}}
 ###
 
-GET {{url}}/filter/group-by-month
+GET {{url}}/filter/group-by-month?year=2024
 Authorization: Bearer {{admin_token}}
 ###
 

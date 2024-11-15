@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDate, IsIn, IsOptional, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { TransactionType } from './create-expense.dto';
 //import { CategoriesList } from 'src/modules/categories/DTO/createCategory.dto';
 
 export class UpdateExpenseDto {
@@ -44,6 +45,31 @@ export class UpdateExpenseDto {
   @IsString()
   @IsOptional()
   category?: string;
+
+  @ApiPropertyOptional({
+    description: "The type of the transaction (income or expense)",
+    example: TransactionType.EXPENSE,
+    enum: TransactionType,  // Displays the enum values in Swagger
+  })
+  @IsOptional()
+  @IsEnum(TransactionType)
+  transaction_type?: TransactionType;
+
+  @ApiPropertyOptional({
+    description: "The currency used for the transaction",
+    example: "USD",
+  })
+  @IsOptional()
+  @IsString({message:"surrency should be of type string"})
+  currency?: string;
+
+  @ApiPropertyOptional({
+    description: "A brief description of the transaction (optional)",
+    example: "Payment for office rent",
+  })
+  @IsOptional()
+  @IsString({message:"description should be of type string"})
+  description?: string;
 
   @ApiPropertyOptional({
     description: 'The file ID for an associated receipt or document (Optional)',

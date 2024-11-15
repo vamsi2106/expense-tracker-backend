@@ -4,54 +4,50 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 // import { RoleGuard } from '../auth/role.guard';
 // import { Roles } from '../auth/role.decorator';
-import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard';
+import { JwtAuthGuard } from '../auth/jwtAuthGuard.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiQuery, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ExpenseQueryDto } from './DTO/expenseQuery.dto';
+import { GroupByCategoryDto } from './DTO/groupByCategory.Dto';
+import { GroupByDateDto, GroupByMonth, GroupByWeekDto } from './DTO/groupByMonth.dto';
+import { AbstractExpense } from './expense.abstract';
 
 @ApiTags('Expenses')
 @ApiBearerAuth()
 @Controller('/tracker/expenses')
+@UseGuards(JwtAuthGuard)
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) { }
+  constructor(private readonly expenseService: AbstractExpense) { }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Create a new expense' })
   @ApiResponse({ status: 201, description: 'The expense has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createExpenseDto: CreateExpenseDto, @Req() req: any) {
     let userId = req.user.user_id;
-    console.log(userId);
     return this.expenseService.create(createExpenseDto, userId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
+
+  @Post('/fetch/data')  // Changed to Post for body data
   @ApiOperation({ summary: 'Retrieve all expenses' })
-  @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Filter by start date' })
-  @ApiQuery({ name: 'endDate', required: false, type: String, description: 'Filter by end date' })
-  @ApiQuery({ name: 'filter', required: false, type: String, description: 'Additional filter criteria' })
-  @ApiQuery({ name: 'transactionType', required: false, type: String, description: 'Filter by transaction type (income/expense)' })
-  @ApiQuery({ name: 'currency', required: false, type: String, description: 'Filter by currency' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit the number of results' })
-  @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Offset for pagination' })
   @ApiResponse({ status: 200, description: 'List of all expenses.' })
   async findAll(
     @Req() req: any,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('filter') filter?: string,
-    @Query('transactionType') transactionType?: string,
-    @Query('currency') currency?: string,
-    @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Body() query: ExpenseQueryDto  // Changed to @Body to accept from body instead of query
   ) {
-    let userId = req.user.user_id;
-    console.log(userId);
-    return this.expenseService.findAll(userId, startDate, endDate, filter, transactionType, currency, limit, offset);
+    const userId = req.user.user_id;
 
+    return await this.expenseService.findAll(userId, query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Retrieve size of the tabel' })
+  @ApiResponse({ status: 200, description: 'Gets ths size of the tabel' })
+  @Get('/fetch/size')
+  async findSize(@Req() req: any) {
+    let { user_id } = req.user;
+    return await this.expenseService.getlength(user_id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a single expense by ID' })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the expense to retrieve' })
@@ -59,16 +55,7 @@ export class ExpenseController {
   @ApiResponse({ status: 404, description: 'Expense not found.' })
   async findOne(@Param('id') id: string, @Req() req: any) {
     let userId = req.user.user_id;
-    const data = await this.expenseService.findOne(userId, id);
-
-    if (!data) {
-      throw new HttpException(
-        { status: HttpStatus.NOT_FOUND, error: "Expense with the given Id does not exist" },
-        HttpStatus.NOT_FOUND,
-      );
-    } else {
-      return data;
-    }
+    return await this.expenseService.findOne(userId, id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -117,9 +104,9 @@ export class ExpenseController {
   @ApiQuery({ name: 'file_id', required: false, type: String, description: 'Filter by file ID (optional)' })
   async getExpensesGroupedByDate(
     @Req() req: any,
-    @Query('offset') offset: number,
-    @Query('file_id') file_id?: string,
+    @Query() params: GroupByDateDto
   ) {
+    let { file_id, offset } = params;
     let userId = req.user.user_id;
     const defaultFileId = file_id ?? null;
     return await this.expenseService.getExpensesGroupedByDateWithOffset(userId, offset, defaultFileId);
@@ -128,54 +115,41 @@ export class ExpenseController {
   @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-category')
   @ApiOperation({ summary: 'Get expenses grouped by category' })
-  @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date for filtering' })
-  @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date for filtering' })
-  @ApiQuery({ name: 'file_id', required: false, type: String, description: 'Filter by file ID (optional)' })
   async getExpensesGroupedByCategory(
     @Req() req: any,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('file_id') file_id?: string,
+    @Query() query: GroupByCategoryDto,
   ) {
     let userId = req.user.user_id;
+    let { file_id, start_date, end_date } = query;
     const defaultFileId = file_id ?? null;
-    return await this.expenseService.getExpensesGroupedByCategory(userId, defaultFileId, startDate, endDate);
+    return await this.expenseService.getExpensesGroupedByCategory(userId, defaultFileId, start_date, end_date);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-week')
   @ApiOperation({ summary: 'Get expenses grouped by week' })
-  @ApiQuery({ name: 'month', required: false, type: Number, description: 'Month for grouping by week (optional)' })
-  @ApiQuery({ name: 'year', required: false, type: Number, description: 'Year for grouping by week (optional)' })
-  @ApiQuery({ name: 'file_id', required: false, type: String, description: 'Filter by file ID (optional)' })
   async getExpensesGroupedByWeek(
     @Req() req: any,
-    @Query('month') month?: number,
-    @Query('year') year?: number,
-    @Query('file_id') file_id?: string,
+    @Query() params: GroupByWeekDto
   ) {
+    let { month, year, file_id } = params;
     let userId = req.user.user_id;
     const currentDate = new Date();
     const defaultMonth = isNaN(month) ? currentDate.getMonth() + 1 : month;
     const defaultYear = isNaN(year) ? currentDate.getFullYear() : year;
     const defaultFileId = file_id ?? null;
-    console.log(year);
-    console.log(userId, defaultMonth, defaultYear, defaultFileId, "parameters from controllers")
-
     return await this.expenseService.getExpensesGroupedByWeek(userId, defaultMonth, defaultYear, defaultFileId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('filter/group-by-month')
   @ApiOperation({ summary: 'Get expenses grouped by month' })
-  @ApiQuery({ name: 'year', required: false, type: Number, description: 'Year for grouping by month (optional)' })
-  @ApiQuery({ name: 'file_id', required: false, type: String, description: 'Filter by file ID (optional)' })
   async getExpensesGroupedByMonth(
     @Req() req: any,
-    @Query('year') year?: number,
-    @Query('file_id') file_id?: string,
+    @Query() params: GroupByMonth
   ) {
     let userId = req.user.user_id;
+    let { year, file_id } = params;
     const currentDate = new Date();
     const defaultYear = year ? (year) : (currentDate.getFullYear());
     const defaultFileId = file_id ?? null;

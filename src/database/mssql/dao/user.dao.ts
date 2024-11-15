@@ -1,12 +1,16 @@
 // src/user/doa/user.dao.ts
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { User } from '../models/user.model';
 import { Role } from 'src/core/enums/roles.enum';
+import { TryCatchBlock } from 'src/common/tryCatchBlock';
+import { ResponseMessages } from 'src/common/messages';
+import { handleResponse, ResponseSchema } from 'src/common/handleResponse';
+import { AbstractUserDao } from '../abstract/userDao.abstract';
+import { msSqlConstants } from '../connection/constants.mssql';
 
 @Injectable()
-export class UserDao {
-  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
+export class UserDao implements AbstractUserDao{
+  constructor(@Inject(msSqlConstants.User) private readonly userModel: typeof User) {}
 
   async createUser(
     username: string,
@@ -14,15 +18,14 @@ export class UserDao {
     role?: Role,
     userImageUrl?: any,
   ): Promise<User> {
-    console.log('Creating user DAO:', username, email, role, userImageUrl);
-    return await this.userModel.create({ username, email, role, userImageUrl });
+     return await this.userModel.create({ username, email, role, userImageUrl });
   }
 
   async findAll(): Promise<User[]> {
     return await this.userModel.findAll();
   }
 
-  async findUserById(id: string) {
+  async findUserById(id: string):Promise<any> {
     return await this.userModel.findByPk(id);
   }
 
@@ -43,7 +46,14 @@ export class UserDao {
     });
   }
 
-  async deleteUserById(id: string) {
+  async deleteUserById(id: string):Promise<any> {
     return await this.userModel.destroy({ where: { userId: id } });
   }
+
+  async getUserSize():Promise<ResponseSchema>{
+    return TryCatchBlock(async ()=>{
+        let response = await this.userModel.count();
+        return handleResponse({status:HttpStatus.OK, message:ResponseMessages.GS, response:{size:response}})
+    })
+}
 }

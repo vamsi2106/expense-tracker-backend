@@ -5,6 +5,17 @@ import { File } from './file.models';
 import { ExpenseTag } from './expenseTags.models';
 import { RecurringTask } from './recurringExpenses.models';
 
+export enum CurrencyTypes {
+usd = 'USD',
+eur = 'EUR',
+inr = 'INR',
+gbp = 'GBP',
+jpy = 'JPY'
+}
+
+export const currencyTypes = ['USD','EUR','INR','GBP','JPY'];
+export const transactionTypes = ['income','expense'];
+
 @Table({ tableName: 'expenses' })
 export class Expense extends Model {
   @PrimaryKey
@@ -55,10 +66,10 @@ export class Expense extends Model {
   date: Date;
 
   @Column({
-    type: DataType.ENUM('USD', 'EUR', 'INR', 'GBP', 'JPY'), // Add major default currencies
+    type: DataType.ENUM(...Object.values(CurrencyTypes)), // Add major default currencies
     allowNull: false,
   })
-  currency: 'USD' | 'EUR' | 'INR' | 'GBP' | 'JPY';
+  currency: CurrencyTypes;
 
   @Column({ type: DataType.STRING, allowNull: true })
   description: string;

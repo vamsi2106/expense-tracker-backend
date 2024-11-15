@@ -1,40 +1,59 @@
 @url = http://localhost:5000/recurring/task
-@token =  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOWJjNTAyZS02NzJlLTQxZmEtOWUzYy1mYThiNjA5ODk3YTYiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwiaWF0IjoxNzI5ODU5ODc4LCJleHAiOjE3MzAxMTkwNzh9.mJbwW1z4baq4ddgjVsM_7co84L2fqmC9TpRYlR48EYs
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOWJjNTAyZS02NzJlLTQxZmEtOWUzYy1mYThiNjA5ODk3YTYiLCJ1c2VybmFtZSI6Im5hZ2Fzcml0aGEiLCJ1c2VySW1hZ2VVcmwiOiJodHRwczovL3Jlcy1jb25zb2xlLmNsb3VkaW5hcnkuY29tL2R0eWlvbWt0cC9tZWRpYV9leHBsb3Jlcl90aHVtYm5haWxzLzRhNDA5YTgwZjA2N2NiNzY3NzlmMzY5MTY3MTFlYzY4L2RldGFpbGVkIiwiZW1haWwiOiJuYWdhc3JpdGhhLmVyQGc3Y3IuY29tIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMjoyMzo1Mi4wOTRaIiwiaWF0IjoxNzMxMDcxMTAxLCJleHAiOjE3MzEzMzAzMDF9.BsElu-XJQOhD5ePyWcRDBhn-jMNE0V4uj7b40Xqjc34
 
-GET {{url}}
+GET {{url}}/get/89f246b4-c421-46a9-b04c-35df14346e25
 Authorization: Bearer {{token}}
+###
+
+POST {{url}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  //"is_active" : null,
+"interval":"month,minute",
+"time":"00:05:00",
+"limit" :50,
+"offset" :0
+}
 ###
 
 GET {{url}}/active
 Authorization: Bearer {{token}}
 ###
 
-POST {{url}}/add/94c0c8de-2a04-4e9a-a022-a51f9a47675e
+GET {{url}}/fetch/size
+Authorization: Bearer {{token}}
+###
+
+POST {{url}}/add/00f2b468-b91b-4251-97c8-4d41cb7a3015
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "minute intervel",
-  "description": "It is a trail trip",
-  "start_date": "2024-10-28",
+  "name": "newintervel",
+  "description": "It is a trail",
+  "start_date": "2024-11-7",
+  "count" : 2,
+  "interval": "week",
+  "time": "23:00:00"
+}
+###
+
+PUT {{url}}/update/b1df367b-dea0-4996-aee5-0d411f0afe59
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "intervel",
+  "description": "It is a trail",
+  "start_date": "2024-11-31",
   "interval": "minute",
-  "time": "04:01:00"
+  "time": "23:00:00",
+  "is_active" : true
 }
 ###
 
-PUT {{url}}/update/b326c0fb-952a-4594-a096-01cee5e43046
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-  "name": "Holiday",
-  "description": "It is a family trip",
-  "start_date": "2024-12-20",
-  "interval": "weekly",
-  "time": "12:00:00"
-}
-###
-
-DELETE {{url}}/delete/e9a49057-0749-4c0f-af18-282ab6b13233
+DELETE {{url}}/delete/1f4f66a5-2733-4f91-a3df-62dcef36d885
 Authorization: Bearer {{token}}
 

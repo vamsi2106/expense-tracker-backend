@@ -1,11 +1,13 @@
 import { BlobServiceClient, generateBlobSASQueryParameters, StorageSharedKeyCredential, BlobSASPermissions } from '@azure/storage-blob';
-import { ConfigServices } from "src/config/appconfig.service";
+//import { ConfigServices } from "src/config/appconfig.service";
+import { AppConfigService } from 'src/config/appConfig.services';
 
 export function sasUrl(blobName: string) {
-    const customService = new ConfigServices(); // Fixed typo
-    const account = customService.getAccountName();
-    const accountKey = customService.getAccountKey();
-    const containerName = customService.getappContainerName();
+    const customService = new AppConfigService(); 
+    let blobDetails = customService.get('blobConnection')// Fixed typo
+    const account = blobDetails.accountName;
+    const accountKey = blobDetails.accountKey;
+    const containerName = blobDetails.containerName;
 
     const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
 

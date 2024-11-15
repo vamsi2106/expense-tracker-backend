@@ -13,19 +13,20 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } 
 import { EmailService } from 'src/email/email.service';
 import { UsersService } from './users.service';
 import { User } from 'src/database/mssql/models/user.model';
-import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard';
+import { JwtAuthGuard } from '../auth/jwtAuthGuard.guard';
 import { Role } from 'src/core/enums/roles.enum';
 import { RoleGuard } from '../auth/role.guard';
 import { Roles } from '../auth/role.decorator';
 import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
+import { AbstractUser } from './user.abstract';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly userService: UsersService,
+    private readonly userService: AbstractUser,
     private readonly emailService: EmailService,
   ) {}
 
@@ -118,6 +119,14 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async findUserByName(@Param('username') username: string) {
     return await this.userService.findUserByName(username);
+  }
+
+  @UseGuards(JwtAuthGuard,RoleGuard)
+  @Roles(Role.admin)
+  @Get('/fetch/size')
+  @ApiOperation({ summary: 'Get the number of users in tabel'})
+  async findUSersCount(){
+    return await this.userService.getSize();
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)

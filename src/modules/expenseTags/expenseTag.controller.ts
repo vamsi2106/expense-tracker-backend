@@ -7,36 +7,32 @@ import {
   Body,
   Param,
   UseGuards,
-  Req
+  Req,
+  Query
 } from '@nestjs/common';
 import { ExpenseTagService } from './expenseTag.service';// Adjust the import path as needed
-import { JwtAuthGuard } from '../auth/jwt-auth-guard.guard'; // Adjust the import path as needed
-import { Roles } from '../auth/role.decorator'; // Adjust the import path as needed
-import { Role } from 'src/core/enums/roles.enum'; // Adjust the import path as needed
+import { JwtAuthGuard } from '../auth/jwtAuthGuard.guard'; // Adjust the import path as needed
 import { CreateExpenseTagDto } from './DTO/createExpenseTag.dto'; // Adjust the import path as needed
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RoleGuard } from '../auth/role.guard';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { QueryExpenseTagDto } from './DTO/queryExpenseTag.dto';
+import { AbstractExpenseTag } from './expenseTag.abstract';
 
 @ApiTags('Expense Tags')
 @ApiBearerAuth()
 @Controller('expenses/tags')
+@UseGuards(JwtAuthGuard)
 export class ExpenseTagController {
-  constructor(private readonly expenseTagService: ExpenseTagService) {}
+  constructor(private readonly expenseTagService: AbstractExpenseTag) {}
 
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new expense tag' })
   @ApiResponse({ status: 201, description: 'Tag created successfully.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Post(':expenseId')
   async create(@Param('expenseId') expenseId:string, @Body() createExpenseTagDto: CreateExpenseTagDto, @Req() req: any) {
-    console.log(expenseId);
-    console.log('called successdully with body', createExpenseTagDto);
     const { user_id } = req.user; // Retrieve userId from req.user
     return await this.expenseTagService.createExpenseTag(createExpenseTagDto, user_id,expenseId);
   }
 
-
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get tag for an expense' })
   @ApiResponse({ status: 200, description: 'List of expense tags.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -47,15 +43,25 @@ export class ExpenseTagController {
     return await this.expenseTagService.getTagsForExpense(expenseId, userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  
   @ApiOperation({ summary: 'Get all tags for an expense' })
   @ApiResponse({ status: 200, description: 'List of expense tags.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Get()
-  async findAll( @Req() req: any) {
+  @Post('/fetch/all')
+  async findAll( @Req() req: any, @Body() params:QueryExpenseTagDto ) {
     const userId = req.user.user_id; // Retrieve userId from req.user
-    return await this.expenseTagService.getALLTagsForExpense(userId);
+    return await this.expenseTagService.getALLTagsForExpense(userId,params);
   }
+
+  @ApiOperation({ summary: 'Get the size of the tags' })
+  @ApiResponse({ status: 200, description: 'Object of tabel size' })
+  @Get('/fetch/size')
+  async findSize( @Req() req: any) {
+    const userId = req.user.user_id; // Retrieve userId from req.user
+    return await this.expenseTagService.getExpensesTagSize(userId);
+  }
+
+  
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a tag' })

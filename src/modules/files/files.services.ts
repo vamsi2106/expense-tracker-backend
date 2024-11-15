@@ -1,222 +1,207 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { FileDao } from 'src/database/mssql/dao/file.dao';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { File } from 'src/database/mssql/models/file.models';
 import * as csvParser from 'csv-parser';
 import { CreateExpenseDto } from '../expenses/dto/create-expense.dto';
-import { ExpenseService } from '../expenses/expense.service';
-import { Sequelize } from 'sequelize-typescript';
 import * as stream from 'stream';
+import { FileQueryDto } from './DTO/filesQuery.dto';
+import { handleResponse } from 'src/common/handleResponse';
+import { ResponseMessages } from 'src/common/messages';
+import { AbstractFileDao } from 'src/database/mssql/abstract/fileDao.abstract';
+import { DatabaseService } from 'src/database/database.service';
+import { AbstractExpense } from '../expenses/expense.abstract';
+import { AbstractAzureBlobStorage } from './abstract/azureBlobStorage.abstract';
+import { AbstractFile } from './abstract/file.abstract';
+import { msSqlConstants } from 'src/database/mssql/connection/constants.mssql';
+import { Sequelize } from 'sequelize';
 
 @Injectable()
-export class FileService {
+export class FileService implements AbstractFile{
   constructor(
-    private readonly fileDao: FileDao,
-    private readonly expenseService: ExpenseService,
-    private readonly sequelize: Sequelize,
-  ) { }
+    private readonly _fileTxn: AbstractFileDao,
+    private readonly _dbSvc:DatabaseService,
+    private readonly expenseService: AbstractExpense,
+    @Inject(msSqlConstants.SequelizeProvider)
+    private sequelize: Sequelize,
+    private readonly azureBlobService: AbstractAzureBlobStorage,
+  ) {
+    this._fileTxn = this._dbSvc.fileSqlTxn; 
+   }
 
-  // async uploadFile(userId: string, file: Express.Multer.File, fileUrl: string): Promise<File> {
-  //   const { originalname, mimetype, size } = file;
-  
-  //   const fileData: Partial<File> = {
-  //     originalFileName: originalname,
-  //     mimeType: mimetype,
-  //     fileUrl,
-  //     size,
-  //     user_id: userId,
-  //   };
-  
-  //   const transaction = await this.sequelize.transaction();
-  
-  //   try {
-  //     const newFile = await this.fileDao.createFile(fileData, { transaction });
-  //     console.log("Entering into the block of processing CSV file");
-  //     let processingResponse = await this.processCsvBuffer(userId, file.buffer, transaction, newFile.id);
-  //     console.log("Processing Response", processingResponse);
-  //     await transaction.commit();
-  //     console.log('Transaction committed successfully.');
-  //     return newFile;
-  //   } catch (error) {
-  //     await transaction.rollback();
-  //     console.error('Transaction rollback due to error:', error.message);
-  //     throw new HttpException(
-  //       `File upload and processing failed: ${error.message}`,
-  //       HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  // }
-  
-  // private async processCsvBuffer(userId: string, buffer: Buffer, transaction: any, fileId: string): Promise<void> {
-  //   const readableStream = new stream.Readable();
-  //   readableStream.push(buffer);
-  //   readableStream.push(null);
-  
-  //   return new Promise<void>((resolve, reject) => {
-  //     const expensePromises: Promise<any>[] = [];
-  
-  //     readableStream
-  //       .pipe(csvParser())
-  //       .on('data', async (row) => {
-  //         try {
-  //           const expenseData: CreateExpenseDto = {
-  //             name: row.name,
-  //             amount: parseFloat(row.amount),
-  //             date: new Date(row.date),
-  //             category: row.category,
-  //             description: row.description,
-  //             transaction_type: row.transaction_type,
-  //             currency: row.currency,
-  //             file_id: fileId,
-  //           };
-  
-  //           console.log("Processing expense row:", expenseData);
-  
-  //           const insertResult: any = await this.expenseService.create(expenseData, userId, { transaction });
-  //           console.log('Insert Result:', insertResult);
-  //           if (insertResult.status !== 200) {
-  //             reject(new HttpException(insertResult.message, HttpStatus.NOT_FOUND));
-  //             return;
-  //           }
-  
-  //           expensePromises.push(insertResult.response);
-  //         } catch (error) {
-  //           reject(new HttpException(`Error processing CSV row: ${error.message}`, HttpStatus.BAD_REQUEST));
-  //         }
-  //       })
-  //       .on('end', async () => {
-  //         try {
-  //           await Promise.all(expensePromises);
-  //           console.log('CSV file successfully processed.');
-  //           resolve();
-  //         } catch (error) {
-  //           reject(new HttpException(`CSV processing failed: ${error.message}`, HttpStatus.BAD_REQUEST));
-  //         }
-  //       })
-  //       .on('error', (error) => {
-  //         reject(new HttpException(`CSV processing failed: ${error.message}`, HttpStatus.BAD_REQUEST));
-  //       });
-  //   });
-  // }
-  
-//claude ai code start
-async uploadFile(userId: string, file: Express.Multer.File, fileUrl: string): Promise<File> {
-  const { originalname, mimetype, size } = file;
-  const fileData: Partial<File> = {
-    originalFileName: originalname,
-    mimeType: mimetype,
-    fileUrl,
-    size,
-    user_id: userId,
-  };
+  async uploadFile(userId: string, file: Express.Multer.File): Promise<File> {
+    const transaction = await this.sequelize.transaction()
+    let newFile:any = null;
+    try {
+      const parsedData = await this.parseCsvBuffer(file.buffer);
+      newFile = await this.handleFileUpload(userId, file, transaction);
 
-  const transaction = await this.sequelize.transaction();
+      await this.createExpenses(userId, parsedData, transaction, newFile.id);
 
-  try {
-    const newFile = await this.fileDao.createFile(fileData, { transaction });
-    console.log("entering into the block of processing csv file");
-    await this.processCsvBuffer(userId, file.buffer, transaction, newFile.id);
-    await transaction.commit();
-    console.log('Transaction committed successfully.');
-    return newFile;
-  } catch (error) {
-    await transaction.rollback();
-    console.error('Transaction rollback due to error:', error.message);
-    throw new HttpException(
-      `File upload and processing failed: ${error.message}`,
-      HttpStatus.BAD_REQUEST,
-    );
+      await transaction.commit();
+      return newFile;
+    } catch (error) {
+      await transaction.rollback();
+      await this.azureBlobService.deleteFile(newFile.originalFileName);
+      console.error('Transaction rollback due to error:', error.message);
+      throw new HttpException(
+        `File upload and processing failed: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
-}
 
-private async processCsvBuffer(userId: string, buffer: Buffer, transaction: any, fileId: string): Promise<void> {
-  const readableStream = new stream.Readable();
-  readableStream.push(buffer);
-  readableStream.push(null);
+  async handleFileUpload(
+    userId: string,
+    file: Express.Multer.File,
+    transaction: any
+  ): Promise<File> {
+    const { originalname, mimetype, size } = file;
+    const fileUrl = await this.azureBlobService.uploadFile(file);
 
-  return new Promise<void>((resolve, reject) => {
-    const expensePromises: Promise<any>[] = [];
+    const fileData: Partial<File> = {
+      originalFileName: originalname,
+      mimeType: mimetype,
+      fileUrl,
+      size,
+      user_id: userId,
+    };
 
-    readableStream
-      .pipe(csvParser())
-      .on('data', (row) => {  // Remove async here
-        try {
-          const expenseData: CreateExpenseDto = {
-            name: row.name,
-            amount: parseFloat(row.amount),
-            date: new Date(row.date),
-            category: row.category,
-            description: row.description,
-            transaction_type: row.transaction_type,
-            currency: row.currency,
-            file_id: fileId,
-          };
+    return await this._fileTxn.createFile(fileData, { transaction });
+  }
 
-          console.log("Processing expense row:", expenseData);
+  parseCsvBuffer(buffer: Buffer): Promise<CreateExpenseDto[]> {
+    return new Promise((resolve, reject) => {
+      const readableStream = new stream.Readable();
+      readableStream.push(buffer);
+      readableStream.push(null);
 
-          // Push the promise instead of awaiting it
-          expensePromises.push(
-            this.expenseService.create(expenseData, userId, { transaction })
-              .then(result => {
-                if (!result || result.status !== 200) {
-                  throw new Error(result?.message || 'Failed to create expense');
-                }
-                return result.response;
-              })
-          );
-        } catch (error) {
-          reject(new HttpException(`Error processing CSV row: ${error.message}`, HttpStatus.BAD_REQUEST));
-        }
-      })
-      .on('end', async () => {
-        try {
-          const results = await Promise.all(expensePromises);
-          console.log('CSV file successfully processed.');
-          resolve();
-        } catch (error) {
-          reject(new HttpException(`CSV processing failed: ${error.message}`, HttpStatus.BAD_REQUEST));
-        }
-      })
-      .on('error', (error) => {
-        reject(new HttpException(`CSV processing failed: ${error.message}`, HttpStatus.BAD_REQUEST));
-      });
-  });
-}
-//end of claude ai code
+      const parsedData: CreateExpenseDto[] = [];
 
+      readableStream
+        .pipe(csvParser())
+        .on('data', (row) => {
+          try {
+            const expenseData = this.validateAndTransformRow(row);
+            parsedData.push(expenseData);
+          } catch (error) {
+            reject(new HttpException(
+              `Error processing CSV row: ${error.message}`,
+              HttpStatus.BAD_REQUEST
+            ));
+          }
+        })
+        .on('end', () => {
+          console.log('CSV parsing completed successfully.');
+          resolve(parsedData);
+        })
+        .on('error', (error) => {
+          reject(new HttpException(
+            `CSV parsing failed: ${error.message}`,
+            HttpStatus.BAD_REQUEST
+          ));
+        });
+    });
+  }
+
+  validateAndTransformRow(row: any): CreateExpenseDto {
+    if (!row.name || !row.amount || !row.date) {
+      throw new Error('Missing required fields: name, amount, or date');
+    }
+
+    const amount = parseFloat(row.amount);
+    if (isNaN(amount)) {
+      throw new Error(`Invalid amount value: ${row.amount}`);
+    }
+
+    const date = new Date(row.date);
+    if (isNaN(date.getTime())) {
+      throw new Error(`Invalid date format: ${row.date}`);
+    }
+
+    return {
+      name: row.name,
+      amount: amount,
+      date: date,
+      category: row.category,
+      description: row.description,
+      transaction_type: row.transaction_type,
+      currency: row.currency,
+    };
+  }
+
+  async createExpenses(
+    userId: string,
+    expenses: CreateExpenseDto[],
+    transaction: any,
+    fileId: string
+  ): Promise<void> {
+    const expensePromises = expenses.map(async (expenseData) => {
+      const enrichedExpenseData = {
+        ...expenseData,
+        file_id: fileId,
+      };
+
+      const result = await this.expenseService.create(
+        enrichedExpenseData,
+        userId,
+        { transaction }
+      );
+
+      if (!result || result.status !== 200) {
+        throw new Error(result?.message || 'Failed to create expense');
+      }
+
+      return result.response;
+    });
+
+    try {
+      await Promise.all(expensePromises);
+      console.log('All expenses created successfully.');
+    } catch (error) {
+      throw new HttpException(
+        `Failed to create expenses: ${error.message}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+  //end of upload file and expenses
 
   async getFileById(userId: string, id: string): Promise<File> {
-    const file = await this.fileDao.findById(userId, id);
+    const file = await this._fileTxn.findById(userId, id);
     if (!file) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
     return file;
   }
 
-  async getAllFiles(userId: string): Promise<File[]> {
-    return this.fileDao.findAll(userId);
+  async getAllFiles(userId: string, params: FileQueryDto): Promise<File[]> {
+    return this._fileTxn.findAll(userId, params);
   }
 
-  async remove(userId: string, id: string): Promise<boolean> {
+  async remove(userId: string, id: string) {
     const transaction = await this.sequelize.transaction();
     try {
-      const file = await this.fileDao.findById(userId, id);
+      const file:any = await this._fileTxn.findById(userId, id);
+      let {originalFileName,id:fileId} = file.response.dataValues;
       if (!file) {
-        throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+        handleResponse({ message: ResponseMessages.DataNot, status: HttpStatus.NOT_FOUND });
       }
+      await this.azureBlobService.deleteFile(originalFileName);
+      await this.expenseService.deleteExpensesByFileId(userId, fileId, { transaction });
 
-      await this.expenseService.deleteExpensesByFileId(userId, file.id, { transaction });
-
-      const result = await this.fileDao.deleteFile(userId, id, { transaction });
+      const result = await this._fileTxn.deleteFile(userId, id, { transaction });
       await transaction.commit();
 
-      return result;
+      return handleResponse({ response: result, message: ResponseMessages.DS, status: HttpStatus.OK });
     } catch (error) {
       await transaction.rollback();
-      console.error("Transaction rolled back due to error:", error.message);
-      throw new HttpException(
-        `Error deleting file and related expenses: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return handleResponse({
+        message: `${ResponseMessages.DE}-${error.message}`,
+        status: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
+  }
+
+  async getFileSize(user_id:string) {
+    return await this._fileTxn.getFileSize(user_id);
   }
 }

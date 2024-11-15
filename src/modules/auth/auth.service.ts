@@ -5,30 +5,37 @@ import axios from 'axios';
 
 import { UsersService } from '../users/users.service';
 import { JwtAuthService } from './jwtAuth.service';
+import { AbstractAuth } from './auth.abstract';
+import { AbstractUser } from '../users/user.abstract';
+import { AppConfigService } from 'src/config/appConfig.services';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AbstractAuth {
+  private readonly oAuthServices: any;
   constructor(
-    private readonly appService: AppService,
+    //private readonly appService: AppService,
     private readonly jwtService: JwtAuthService,
-    private readonly userService: UsersService,
-  ) {}
+    private readonly userService: AbstractUser,
+    private readonly appService: AppConfigService
+  ) {
+    this.oAuthServices = this.appService.get('oAuth');
+  }
 
   async getAuthUrl(): Promise<string> {
     try {
-      let tentantId = this.appService.getTenantId();
-      let client_id = this.appService.getClientId();
-      let redirect_uri = this.appService.getRedirectUri();
+      const tenantId = this.oAuthServices.tenantId;
 
-      const authUrl =
-        `https://login.microsoftonline.com/${tentantId}/oauth2/v2.0/authorize?` +
+      const clientId = this.oAuthServices.clientId;
+      const redirectUri = this.oAuthServices.redirectUri;
+
+      const authUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?` +
         new URLSearchParams({
-          client_id: client_id,
+          client_id: clientId,
           response_type: 'code',
-          redirect_uri: redirect_uri,
+          redirect_uri: redirectUri,
           scope: 'openid profile email User.read',
           response_mode: 'query',
-        } as Record<string, string>).toString();
+        }).toString();
 
       return authUrl;
     } catch (e) {
@@ -36,35 +43,31 @@ export class AuthService {
     }
   }
 
-  // src/modules/auth/auth.service.ts
   async exchangeCodeForTokens(code: string) {
     try {
-      const tentantId = this.appService.getTenantId();
-      const client_id = this.appService.getClientId();
-      const redirect_uri = this.appService.getRedirectUri();
-      const client_secret = this.appService.getClientSecret();
+      const tenantId = this.oAuthServices.tenentId;
+      const clientId = this.oAuthServices.clientId;
+      const redirectUri = this.oAuthServices.redirectUri;
+      const clientSecret = this.oAuthServices.clientSecret;
 
+      // Using the request body instead of URL parameters for the token exchange
       const tokenResponse = await axios.post(
-        `https://login.microsoftonline.com/${tentantId}/oauth2/v2.0/token`,
-        new URLSearchParams({
-          client_id: client_id,
-          client_secret: client_secret,
+        `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+        {
+          client_id: clientId,
+          client_secret: clientSecret,
           code: code,
-          redirect_uri: redirect_uri,
+          redirect_uri: redirectUri,
           grant_type: 'authorization_code',
-        }).toString(),
+        },
         {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         },
       );
 
-      const userDetails = await this.getUserDetails(
-        tokenResponse.data.access_token,
-      );
+      const userDetails = await this.getUserDetails(tokenResponse.data.access_token);
       const user = await this.userService.findUserByEmail(userDetails.mail);
-      console.log('payload return', user);
-
-      if (!user) {
+       if (!user) {
         // User not found, return an error message to the frontend
         return { error: 'User not found', redirect: true };
       }
@@ -99,3 +102,4 @@ export class AuthService {
     }
   }
 }
+

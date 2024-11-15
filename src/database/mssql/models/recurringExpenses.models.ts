@@ -4,9 +4,9 @@ import { Expense } from './expenses.models';
 
 export enum Interval {
   DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
+  WEEKLY = 'week',
+  MONTHLY = 'month',
+  YEARLY = 'year',
   HOURLY = 'hour',
   MINUTE = 'minute',
 }
@@ -36,6 +36,9 @@ export class RecurringTask extends Model {
   @Column({ type: DataType.DATE, allowNull: true })
   end_date: Date; // Optional end date for the task
 
+  @Column({type:DataType.INTEGER, allowNull :true})
+  count:number
+
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
@@ -55,7 +58,7 @@ export class RecurringTask extends Model {
   })
   interval: Interval; // Interval type (e.g., 'Daily', 'Weekly', 'Monthly', or cron expression)
 
-  @Column({ type: DataType.TIME, allowNull: false })
+  @Column({ type: DataType.TIME, allowNull: true })
   time: string; // Specific time of day for execution (HH:MM:SS)
 
   @Column({

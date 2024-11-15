@@ -1,39 +1,31 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Expense } from '../models/expenses.models';
+import { currencyTypes, Expense } from '../models/expenses.models';
 import { CreateExpenseDto } from 'src/modules/expenses/dto/create-expense.dto';
 import { UpdateExpenseDto } from 'src/modules/expenses/dto/update-expense.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { Op } from 'sequelize';
+import { HttpStatus } from '@nestjs/common';
 import * as moment from 'moment';
 import { Sequelize, Sequelize as sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
-import { Category } from '../models/category.models';
-import { CategoryDao } from './category.dao';
 import { TryCatchBlock } from 'src/common/tryCatchBlock';
 import { ResponseMessages } from 'src/common/messages';
 import { handleResponse, ResponseSchema } from 'src/common/handleResponse';
-//import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter';
-import { response } from 'express';
-import { CreateCategoryDto } from 'src/modules/categories/DTO/createCategory.dto';
+import { ExpenseQueryDto } from 'src/modules/expenses/DTO/expenseQuery.dto';
+import { AbstractExpenseDao } from '../abstract/expenseDao.abstract';
+import { msSqlConstants } from '../connection/constants.mssql';
+import { AbstractCategoryDao } from '../abstract/categoryDao.abstract';
 
 @Injectable()
-export class ExpenseDao {
+export class ExpenseDao implements AbstractExpenseDao {
   constructor(
-    @InjectModel(Expense)  // Sequelize model injection
+    @Inject(msSqlConstants.Expense)  // Sequelize model injection
     private readonly expenseModel: typeof Expense,  // Ensure this matches
-    @Inject(CategoryDao)
-    private readonly categoryDao = new CategoryDao(),
-    @InjectModel(Category)
-    private categoryModel: typeof Category,
-    @Inject(Sequelize) // Use the Sequelize injection here
+    // @Inject(CategoryDao)
+    private readonly categoryDao: AbstractCategoryDao,
+    @Inject(msSqlConstants.SequelizeProvider) // Use the Sequelize injection here
     private sequelize: Sequelize,
-    //private readonly globalExceptionFilter: GlobalExceptionFilter // Inject GlobalExceptionFilter
-
-
   ) { }
 
-  private async getCategoryId(category: string, userId: string): Promise<ResponseSchema> {
+  async getCategoryId(category: string, userId: string): Promise<ResponseSchema> {
     return TryCatchBlock(async () => {
       const categoryResult: any = await this.categoryDao.getCategoryByName(category, userId);
       if (!categoryResult.response) {
@@ -44,73 +36,23 @@ export class ExpenseDao {
     })
   }
 
-  // async createExpense(
-  //   createExpenseDto: CreateExpenseDto,
-  //   userId: string,
-  //   options?: any
-  // ): Promise<ResponseSchema> {
-
-  //   return TryCatchBlock(async () => {
-  //     const { name, amount, date, category, description, transaction_type, currency, file_id } = createExpenseDto;
-  //     const updatedFullDate = new Date(date).toISOString();
-  //     let data = await this.getCategoryId(category, userId);
-  //     console.log("gggggg",data);
-  //     if (!data.response) {
-  //       return handleResponse({ message: ResponseMessages.CNot, status: HttpStatus.NOT_FOUND });
-  //     }
-  //     createExpenseDto.category = data.response 
-  //     // Check for existing expense with the same name, amount, date, and category
-  //     const existingExpense = await this.expenseModel.findOne({
-  //       where: {
-  //         name,
-  //         category_id: createExpenseDto.category,
-  //         date: updatedFullDate,
-  //         user_id: userId,
-  //         transaction_type: transaction_type,
-  //         currency: currency
-  //       },
-  //     });
-
-  //     if (existingExpense) {
-  //       return handleResponse({ message: ResponseMessages.EExist, status: HttpStatus.CONFLICT });
-  //     }
-
-  //     const createExpenseData = {
-  //       user_id: userId,
-  //       name,
-  //       category_id: createExpenseDto.category,
-  //       transaction_type,
-  //       amount: Number(amount),
-  //       date: updatedFullDate,
-  //       currency,
-  //       description,
-  //       file_id
-  //     };
-
-  //     let response = await this.expenseModel.create(createExpenseData, options);
-  //     return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.PS, response })
-  //   })
-  // }
-
-  //cloud ai code started
   async createExpense(
     createExpenseDto: CreateExpenseDto,
     userId: string,
     options?: any
-): Promise<ResponseSchema> {
+  ): Promise<ResponseSchema> {
     return TryCatchBlock(async () => {
       const { name, amount, date, category, description, transaction_type, currency, file_id } = createExpenseDto;
       const updatedFullDate = new Date(date).toISOString();
-      
+
       const categoryData = await this.getCategoryId(category, userId);
-      console.log("Category data:", categoryData);
-      
+    
       if (!categoryData.response) {
         return handleResponse({ message: ResponseMessages.CNot, status: HttpStatus.NOT_FOUND });
       }
 
       const categoryId = categoryData.response;
-      
+
       // Check for existing expense
       const existingExpense = await this.expenseModel.findOne({
         where: {
@@ -143,47 +85,116 @@ export class ExpenseDao {
       const response = await this.expenseModel.create(createExpenseData, options);
       return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.PS, response });
     });
-}
-//end of claud ai code
-
-
-  async findAllExpenses(
-    userId: string,
-    startDate?: string,
-    endDate?: string,
-    filter?: string,
-    transactionType?: string,
-    currency?: string,
-    limit?: number,
-    offset?: number
-  ): Promise<ResponseSchema> {
-    return TryCatchBlock(async () => {
-      const expenses = await this.sequelize.query(`
-        SELECT e.*, c.name AS category_name
-        FROM expenses e
-        LEFT JOIN categories c ON e.category_id = c.id
-        WHERE e.user_id = :userId
-        ${startDate && endDate ? 'AND e.date BETWEEN :startDate AND :endDate' : ''}
-        ${filter ? 'AND c.name = :filter' : ''}
-        ${currency ? 'AND e.currency = :currency' : ''}
-        ${transactionType ? 'AND e.transaction_type = :transactionType' : ''}
-      `, {
-        replacements: {
-          userId,
-          startDate,
-          endDate,
-          filter,
-          currency,
-          transactionType,
-        },
-        type: QueryTypes.SELECT,
-      });
-
-
-      console.log(expenses);
-      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: expenses });
-    })
   }
+
+  async addRecurringExpence(newDate:any,expense_id: string): Promise<any> {
+    try {
+      const sourceExpense = await this.expenseModel.findByPk(expense_id);
+      if (!sourceExpense) {
+        return (ResponseMessages.DataNot);
+      }
+      let expenseData = {
+        name: sourceExpense.name,
+        amount: sourceExpense.amount,
+        date: newDate,
+        category_id: sourceExpense.category_id,
+        transaction_type: sourceExpense.transaction_type,
+        currency: sourceExpense.currency,
+        description: sourceExpense.description,
+        user_id:sourceExpense.user_id
+    }
+      await this.expenseModel.create({ ...expenseData });
+      return;
+    } catch (err) {
+      return err.message;
+    }
+  }
+
+  async findAllExpenses(userId: string, query: ExpenseQueryDto): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      let {
+        name,
+        start_date,
+        end_date,
+        category,
+        transaction_type,
+        currency,
+        limit,
+        offset,
+        min_price,
+        max_price,
+      } = query;
+
+      let currencyValues = null;
+      let transactionTypeValues = null;
+      let categoryValues = null;
+
+      // Split and validate currency values
+      if (currency) {
+        currencyValues = currency.split(',');
+        // Check if there are any invalid currency types
+        if (!currencyValues.every(item => currencyTypes.includes(item))) {
+          return handleResponse({ status: HttpStatus.BAD_REQUEST, message: ResponseMessages.BR });
+        }
+      }
+
+      // Split and validate transaction type values
+      if (transaction_type) {
+        transactionTypeValues = transaction_type.split(',');
+        // Check if there are any invalid transaction types
+        if (!transactionTypeValues.every(item => ['expense', 'income'].includes(item))) {
+          return handleResponse({ status: HttpStatus.BAD_REQUEST, message: ResponseMessages.BR });
+        }
+      }
+
+      // Split category values
+      if (category) {
+        categoryValues = category.split(',');
+      }
+
+      // Execute the SQL query
+      const expenses = await this.sequelize.query(
+        `
+          SELECT e.*, c.name AS category_name
+          FROM expenses e
+          LEFT JOIN categories c ON e.category_id = c.id
+          WHERE e.user_id = :userId
+          ${name ? 'AND e.name LIKE :name' : ''}
+          ${start_date ? 'AND e.date >= :start_date' : ''}
+          ${end_date ? 'AND e.date <= :end_date' : ''}
+          ${categoryValues && categoryValues.length > 0 ? 'AND c.name IN (:categoryValues)' : ''}
+          ${transactionTypeValues && transactionTypeValues.length > 0 ? 'AND e.transaction_type IN (:transactionTypeValues)' : ''}
+          ${currencyValues && currencyValues.length > 0 ? 'AND e.currency IN (:currencyValues)' : ''}
+          ${typeof min_price !== 'undefined' ? 'AND e.amount >= :min_price' : ''}
+          ${typeof max_price !== 'undefined' ? 'AND e.amount <= :max_price' : ''}
+          ORDER BY e.date DESC
+          OFFSET :offset ROWS
+          FETCH NEXT :limit ROWS ONLY
+        `,
+        {
+          replacements: {
+            userId,
+            name: name ? `%${name}%` : undefined,
+            start_date,
+            end_date,
+            categoryValues,
+            transactionTypeValues,
+            currencyValues,
+            min_price,
+            max_price,
+            limit: Number(limit) || 50,
+            offset: Number(offset) || 0,
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
+
+      const size = await this.expenseModel.count({where :{user_id:userId}})
+
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: expenses, size });
+    });
+  }
+
 
 
   async findExpenseById(userId: string, id: string): Promise<any> {
@@ -202,9 +213,7 @@ export class ExpenseDao {
         return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.CNot })
       }
 
-      // Check if the expense exists and return it; otherwise, return null
-      //return expense.length > 0 ? expense[0] : null;
-      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: expense });
+     return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: expense });
     })
   }
 
@@ -214,21 +223,16 @@ export class ExpenseDao {
         user_id: userId,
         id
       };
-      console.log(updateExpenseDto);
-      console.log(updateExpenseDto.category);
-
+    
       const expense = await this.expenseModel.findOne({ where: whereClause });
-      console.log(expense);
       if (!expense) return handleResponse({ status: HttpStatus.NOT_FOUND, message: ResponseMessages.DataNot }); // Expense not found
 
       // If category is updated, retrieve the new category ID
       if (updateExpenseDto.category !== undefined) {
         let category_id_result = await this.getCategoryId(updateExpenseDto.category, userId);
-        console.log(category_id_result, 'from the expenses update');
-        if (category_id_result.status != 200) {
+       if (category_id_result.status != 200) {
           return category_id_result;
         }
-        console.log('category', category_id_result.response);
         updateExpenseDto.category = category_id_result.response;
       }
 
@@ -262,7 +266,7 @@ export class ExpenseDao {
         ...options
       });
 
-      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.DS , response :deletedCount});
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.DS, response: deletedCount });
     })
   }
 
@@ -315,9 +319,10 @@ export class ExpenseDao {
         SELECT c.name, SUM(expenses.amount) AS total_amount, currency, transaction_type
         FROM expenses
         LEFT JOIN categories c ON expenses.category_id = c.id
-        WHERE (expenses.file_id = :file_id OR :file_id IS NULL) 
-              AND expenses.user_id = :userId
+        WHERE 
+              expenses.user_id = :userId
               AND expenses.date BETWEEN :startDate AND :endDate
+               ${file_id ? 'AND file_id = :file_id' : ''}
         GROUP BY c.name, currency, transaction_type;
       `;
 
@@ -338,10 +343,6 @@ export class ExpenseDao {
     })
   }
 
-
-
-
-
   // 3. Group by Week
   // Group expenses by category and transaction type
   async getExpensesGroupedByWeek(
@@ -351,7 +352,6 @@ export class ExpenseDao {
     file_id: string | null
   ): Promise<ResponseSchema> {
     return TryCatchBlock(async () => {
-      console.log(year, month, file_id,"parameters");
 
       const query = `
       SELECT 
@@ -396,8 +396,6 @@ export class ExpenseDao {
 
   }
 
-
-
   // 4. Group by Month
   // Group expenses by category and transaction type for the specified month and year
   async getExpensesGroupedByMonth(
@@ -438,6 +436,15 @@ export class ExpenseDao {
         type: QueryTypes.SELECT,
       });
       return handleResponse({ status: HttpStatus.OK, response: data, message: ResponseMessages.GS });
+    })
+  }
+
+  async getTotalLength(user_id): Promise<ResponseSchema> {
+    return TryCatchBlock(async () => {
+      let response = await this.expenseModel.count({
+        where: { user_id }
+      });
+      return handleResponse({ status: HttpStatus.OK, message: ResponseMessages.GS, response: { size: response } })
     })
   }
 }

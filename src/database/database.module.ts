@@ -1,20 +1,23 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { DatabaseConfigService } from './mssql/connection/connection.mssql';
-import { UserDao } from './mssql/dao/user.dao';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { DatabaseService } from './database.service';
-import { User } from './mssql/models/user.model';
-import { Expense } from './mssql/models/expenses.models';
-import { ExpenseDao } from './mssql/dao/expenses.dao';
-import { DaoList, SchemasList } from './mssql/connection/schemas.mssql';
-import { Category } from './mssql/models/category.models';
-//import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter';
-import { GlobalModule } from 'src/logger/globalModule';
-import { GlobalExceptionFilter } from 'src/logger/globalExeption.filter';
+import { ProviderDaoList } from './mssql/connection/daoProviders.mssql';
+import { mssqlModalProvider } from './mssql/connection/models.connection.mssql';
 
 @Module({
-  imports: [GlobalModule,DatabaseConfigService, SequelizeModule.forFeature(SchemasList)],
-  providers: [DatabaseService,...DaoList, GlobalExceptionFilter],
-  exports: [DatabaseService, ...DaoList, GlobalExceptionFilter],
+  //imports: [SequelizeModule.forFeature(SchemasList)],
+  imports: [    ],
+  providers: [
+    DatabaseService,
+    ...DatabaseConfigService,
+    ...mssqlModalProvider,
+    ...ProviderDaoList,
+  ],
+  exports: [
+    DatabaseService,
+    ...DatabaseConfigService,
+    ...mssqlModalProvider,
+    ...ProviderDaoList,
+  ],
 })
-export class DbModule {}
+export class DbModule { }
